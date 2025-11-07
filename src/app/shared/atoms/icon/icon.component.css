@@ -1,0 +1,20 @@
+.app-icon {
+  @apply inline-flex items-center justify-center;
+}
+
+.app-icon--sm {
+  @apply text-base;
+}
+
+.app-icon--md {
+  @apply text-lg;
+}
+
+.app-icon--lg {
+  @apply text-xl;
+}
+
+.app-icon--xl {
+  @apply text-2xl;
+}
+

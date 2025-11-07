@@ -1,0 +1,14 @@
+<app-auth-template>
+  <app-auth-image 
+    image
+    [imageUrl]="signupImageUrl"
+    [imageAlt]="signupImageAlt">
+  </app-auth-image>
+  
+  <app-signup-form
+    [showPassword]="showPassword"
+    (togglePassword)="togglePasswordVisibility()"
+    (submit)="onSignupSubmit($event)">
+  </app-signup-form>
+</app-auth-template>
+

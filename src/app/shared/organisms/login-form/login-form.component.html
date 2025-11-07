@@ -1,0 +1,39 @@
+<form class="flex flex-col gap-6" (ngSubmit)="onSubmit()">
+  <app-form-field
+    label="Email"
+    type="email"
+    placeholder="Digite seu email"
+    name="email"
+    [value]="email"
+    (valueChange)="email = $event">
+  </app-form-field>
+
+  <div class="flex flex-col w-full gap-2">
+    <app-password-field
+      label="Senha"
+      placeholder="Digite sua senha"
+      name="password"
+      [showPassword]="showPassword"
+      [value]="password"
+      (valueChange)="password = $event"
+      (togglePassword)="onTogglePassword()">
+    </app-password-field>
+    <div class="flex justify-start">
+      <app-link href="#" variant="default" class="text-sm">Esqueceu a senha?</app-link>
+    </div>
+  </div>
+
+  <app-button type="submit" variant="primary" size="lg" [fullWidth]="true" class="mt-4">
+    Entrar
+  </app-button>
+</form>
+
+<div class="text-center mt-8">
+  <button 
+    type="button"
+    (click)="navigateToSignup()"
+    class="text-sm text-text-muted-dark dark:text-text-muted-light hover:underline bg-transparent border-none cursor-pointer p-0">
+    Não tem uma conta? Cadastre-se
+  </button>
+</div>
+

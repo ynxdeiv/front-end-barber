@@ -1,0 +1,19 @@
+<app-auth-template>
+  <app-auth-image 
+    image
+    [imageUrl]="loginImageUrl"
+    [imageAlt]="loginImageAlt">
+  </app-auth-image>
+  
+  <app-auth-header 
+    title="Barber Agenda"
+    subtitle="Bem-vindo de volta">
+  </app-auth-header>
+  
+  <app-login-form
+    [showPassword]="showPassword"
+    (togglePassword)="togglePasswordVisibility()"
+    (submit)="onLoginSubmit($event)">
+  </app-login-form>
+</app-auth-template>
+

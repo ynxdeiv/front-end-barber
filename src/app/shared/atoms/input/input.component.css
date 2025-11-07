@@ -1,0 +1,45 @@
+:host {
+  display: block;
+  width: 100%;
+  background: transparent;
+}
+
+input.app-input {
+  background-color: var(--input-bg-light) !important;
+  border: 1px solid var(--border-light) !important;
+  box-shadow: none !important;
+  color: var(--text-dark) !important;
+  height: 3.5rem !important;
+  min-height: 3.5rem !important;
+  max-height: 3.5rem !important;
+  padding-left: 15px !important;
+  padding-right: 3rem !important;
+  padding-top: 15px !important;
+  padding-bottom: 15px !important;
+  font-size: 1rem !important;
+  line-height: 1.5 !important;
+  box-sizing: border-box !important;
+  width: 100% !important;
+}
+
+.dark input.app-input {
+  background-color: var(--input-bg-dark) !important;
+  border: 1px solid var(--border-dark) !important;
+  color: var(--text-dark) !important;
+}
+
+input.app-input:focus {
+  outline: none !important;
+  border-color: var(--primary) !important;
+  box-shadow: none !important;
+  color: var(--text-dark) !important;
+}
+
+input.app-input::placeholder {
+  color: var(--text-muted-dark) !important;
+}
+
+.dark input.app-input::placeholder {
+  color: var(--text-muted-light) !important;
+}
+

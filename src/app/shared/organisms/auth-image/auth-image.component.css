@@ -1,0 +1,17 @@
+:host {
+  display: block;
+  width: 100%;
+  height: 100%;
+  min-height: 100%;
+}
+
+div[style*="background-image"] {
+  min-height: 100%;
+  height: 100%;
+}
+
+.w-full.md\:w-1\/2 {
+  min-height: 100%;
+  height: 100%;
+}
+

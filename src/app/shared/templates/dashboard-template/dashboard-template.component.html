@@ -1,0 +1,23 @@
+<div class="flex h-screen w-full bg-background-light dark:bg-background-dark font-display text-text-dark dark:text-text-light overflow-hidden relative">
+  <div 
+    *ngIf="isMobile && isSidebarOpen"
+    class="fixed inset-0 bg-black/50 z-40 md:hidden"
+    (click)="toggleSidebar()">
+  </div>
+  <app-sidebar 
+    [isOpen]="isSidebarOpen"
+    (toggleSidebar)="toggleSidebar()"
+    [class.sidebar-open]="isSidebarOpen"
+    [class.sidebar-collapsed]="!isSidebarOpen && !isMobile">
+  </app-sidebar>
+  <main class="flex-1 overflow-y-auto bg-background-light dark:bg-background-dark transition-all duration-300 relative">
+    <button 
+      *ngIf="isMobile && !isSidebarOpen"
+      (click)="toggleSidebar()"
+      class="absolute top-4 right-4 z-50 md:hidden flex items-center justify-center size-12 rounded-lg bg-primary text-pearl-white shadow-lg transition-colors">
+      <app-icon name="menu" size="lg"></app-icon>
+    </button>
+    <ng-content></ng-content>
+  </main>
+</div>
+

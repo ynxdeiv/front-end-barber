@@ -1,0 +1,28 @@
+:host {
+  display: block;
+  width: 100%;
+  background: transparent;
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+label {
+  background: transparent;
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+:host ::ng-deep app-input {
+  border: none !important;
+}
+
+:host ::ng-deep .app-input {
+  border: 1px solid var(--border-light) !important;
+}
+
+:host ::ng-deep .dark .app-input {
+  border: 1px solid var(--border-dark) !important;
+}
+

@@ -1,0 +1,38 @@
+<div class="lg:col-span-1 bg-input-bg-light dark:bg-input-bg-dark p-4 sm:p-6 rounded-xl border border-border-light dark:border-border-dark">
+  <div class="flex w-full flex-col gap-0.5">
+    <div class="flex items-center p-1 justify-between">
+      <button 
+        class="hover:bg-background-light dark:hover:bg-input-bg-dark rounded-full"
+        (click)="previousMonth()">
+        <app-icon name="chevron_left" size="lg" class="text-text-dark dark:text-text-light flex size-10 items-center justify-center"></app-icon>
+      </button>
+      <p class="text-text-dark dark:text-text-light text-base font-bold leading-tight flex-1 text-center">{{ currentMonthName }}</p>
+      <button 
+        class="hover:bg-background-light dark:hover:bg-input-bg-dark rounded-full"
+        (click)="nextMonth()">
+        <app-icon name="chevron_right" size="lg" class="text-text-dark dark:text-text-light flex size-10 items-center justify-center"></app-icon>
+      </button>
+    </div>
+    <div class="grid grid-cols-7 mt-2">
+      @for (day of weekDays; track day) {
+        <p class="text-text-muted-dark dark:text-text-light text-[13px] font-bold leading-normal tracking-[0.015em] flex h-12 w-full items-center justify-center pb-0.5">{{ day }}</p>
+      }
+      @for (day of daysInMonth; track $index) {
+        @if (day === 0) {
+          <div class="h-12 w-full"></div>
+        } @else {
+          <button 
+            class="h-12 w-full text-text-dark dark:text-text-light text-sm font-medium leading-normal hover:bg-background-light dark:hover:bg-input-bg-dark rounded-full"
+            [class.bg-primary]="isSelected(day)"
+            [class.dark\:bg-primary]="isSelected(day)"
+            [class.text-pearl-white]="isSelected(day)"
+            [class.dark\:text-pearl-white]="isSelected(day)"
+            (click)="selectDay(day)">
+            <div class="flex size-full items-center justify-center">{{ day }}</div>
+          </button>
+        }
+      }
+    </div>
+  </div>
+</div>
+

@@ -1,0 +1,16 @@
+.app-link {
+  @apply font-medium hover:underline transition-colors;
+}
+
+.app-link--default {
+  @apply text-pearl-white dark:text-pearl-white;
+}
+
+.app-link--primary {
+  @apply text-primary;
+}
+
+a.app-link {
+  @apply no-underline;
+}
+

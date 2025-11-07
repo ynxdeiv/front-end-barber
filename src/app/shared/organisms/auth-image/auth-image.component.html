@@ -1,0 +1,25 @@
+@if (showTitle) {
+  <div class="relative hidden flex-col items-center justify-center gap-8 bg-background-dark p-8 text-center lg:flex">
+    <div class="flex flex-col gap-6">
+      <div class="flex flex-col gap-2 text-left">
+        <h1 class="text-text-light text-5xl font-black leading-tight tracking-[-0.033em]">{{ title }}</h1>
+        <h2 class="text-text-muted-light text-base font-normal leading-normal">{{ subtitle }}</h2>
+      </div>
+    </div>
+    <div 
+      class="w-full max-w-sm aspect-square bg-center bg-no-repeat bg-cover rounded-lg" 
+      [attr.data-alt]="imageAlt"
+      [style.background-image]="'url(' + imageUrl + ')'">
+    </div>
+  </div>
+} @else {
+  <div class="w-full h-full hidden md:flex relative overflow-hidden min-h-screen md:min-h-full">
+    <div 
+      class="w-full h-full min-h-full bg-center bg-no-repeat bg-cover" 
+      [attr.data-alt]="imageAlt"
+      [style.background-image]="'url(' + imageUrl + ')'">
+    </div>
+    <div class="absolute inset-0 bg-gradient-to-r from-transparent via-primary/10 to-primary/30"></div>
+  </div>
+}
+

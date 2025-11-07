@@ -1,0 +1,61 @@
+<div class="flex w-full max-w-md flex-col gap-8">
+  <div class="flex flex-col gap-3">
+    <p class="text-text-dark dark:text-text-light text-2xl sm:text-3xl md:text-4xl font-black leading-tight tracking-[-0.033em]">Crie sua conta</p>
+    <p class="text-text-muted-dark dark:text-text-muted-light text-sm sm:text-base font-normal leading-normal">Preencha os campos abaixo para começar.</p>
+  </div>
+
+  <form class="flex flex-col gap-4" (ngSubmit)="onSubmit()">
+    <app-form-field
+      label="Nome"
+      type="text"
+      placeholder="Digite seu nome completo"
+      name="name"
+      [value]="name"
+      (valueChange)="name = $event">
+    </app-form-field>
+
+    <app-form-field
+      label="Email"
+      type="email"
+      placeholder="seuemail@exemplo.com"
+      name="email"
+      [value]="email"
+      (valueChange)="email = $event">
+    </app-form-field>
+
+    <app-form-field
+      label="Telefone"
+      type="tel"
+      placeholder="(XX) XXXXX-XXXX"
+      name="phone"
+      [value]="phone"
+      (valueChange)="phone = $event">
+    </app-form-field>
+
+    <app-password-field
+      label="Senha"
+      placeholder="Crie uma senha segura"
+      name="password"
+      [showPassword]="showPassword"
+      [value]="password"
+      (valueChange)="password = $event"
+      (togglePassword)="onTogglePassword()">
+    </app-password-field>
+
+    <button 
+      type="submit"
+      class="flex mt-4 min-w-[84px] w-full cursor-pointer items-center justify-center overflow-hidden rounded-lg h-12 px-5 bg-background-light text-text-dark text-base font-bold leading-normal tracking-[0.015em] hover:bg-zinc-200 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:ring-offset-2 dark:bg-text-light dark:text-text-dark dark:hover:bg-zinc-300 dark:focus:ring-offset-background-dark">
+      <span class="truncate">Cadastrar</span>
+    </button>
+  </form>
+
+  <div class="text-center">
+    <button 
+      type="button"
+      (click)="navigateToLogin()"
+      class="text-sm text-text-muted-dark dark:text-text-muted-light hover:underline bg-transparent border-none cursor-pointer p-0">
+      Já tem uma conta? Faça login
+    </button>
+  </div>
+</div>
+

@@ -1,0 +1,36 @@
+.app-button {
+  @apply cursor-pointer items-center justify-center overflow-hidden rounded-lg font-bold leading-normal tracking-[0.015em] transition-colors;
+}
+
+.app-button--primary {
+  @apply bg-background-light text-text-dark hover:bg-input-bg-light focus:outline-none focus:ring-2 focus:ring-primary/50 focus:ring-offset-2 dark:bg-pearl-white dark:text-text-dark dark:hover:bg-input-bg-light dark:focus:ring-offset-background-dark;
+}
+
+.app-button--secondary {
+  @apply bg-primary dark:bg-primary text-pearl-white dark:text-pearl-white hover:bg-primary-darker dark:hover:bg-primary-darker;
+}
+
+.app-button--outline {
+  @apply border border-border-light dark:border-border-dark bg-transparent text-text-dark dark:text-text-light hover:bg-input-bg-light dark:hover:bg-input-bg-dark;
+}
+
+.app-button--sm {
+  @apply h-8 px-4 text-sm;
+}
+
+.app-button--md {
+  @apply h-12 px-5 text-base;
+}
+
+.app-button--lg {
+  @apply h-14 px-5 text-base;
+}
+
+.app-button--full {
+  @apply w-full;
+}
+
+.app-button:disabled {
+  @apply opacity-50 cursor-not-allowed;
+}
+

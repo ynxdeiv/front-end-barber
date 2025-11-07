@@ -1,0 +1,45 @@
+@if (available) {
+  <div 
+    class="flex items-center gap-4 bg-input-bg-light dark:bg-input-bg-dark px-4 py-3 min-h-14 justify-between rounded-lg border border-border-light dark:border-border-dark"
+    [class.ring-2]="selected"
+    [class.ring-primary]="selected"
+    [class.dark\:ring-primary]="selected">
+    <div class="flex items-center gap-4">
+      <div class="text-text-muted-dark dark:text-text-light flex items-center justify-center rounded-lg bg-background-light dark:bg-input-bg-dark shrink-0 size-10">
+        <app-icon name="schedule" size="md"></app-icon>
+      </div>
+      <p 
+        class="text-base leading-normal flex-1 truncate"
+        [class.text-text-dark]="!selected"
+        [class.dark:text-text-light]="!selected"
+        [class.font-normal]="!selected"
+        [class.font-medium]="selected">
+        {{ start }} - {{ end }}
+      </p>
+    </div>
+    <div class="shrink-0">
+      <app-button 
+        type="button"
+        variant="secondary"
+        size="sm"
+        (click)="onSchedule()">
+        Agendar
+      </app-button>
+    </div>
+  </div>
+} @else {
+  <div class="flex items-center gap-4 bg-background-light dark:bg-input-bg-dark/50 px-4 py-3 min-h-14 justify-between rounded-lg border border-border-light dark:border-border-dark opacity-60">
+    <div class="flex items-center gap-4">
+      <div class="text-text-muted-dark dark:text-text-muted-light flex items-center justify-center rounded-lg bg-background-light dark:bg-input-bg-dark shrink-0 size-10">
+        <app-icon name="schedule" size="md"></app-icon>
+      </div>
+      <p class="text-text-muted-dark dark:text-text-muted-light text-base font-normal leading-normal flex-1 truncate">
+        {{ start }} - {{ end }}
+      </p>
+    </div>
+    <div class="shrink-0">
+      <span class="text-text-muted-dark dark:text-text-muted-light text-sm font-medium">Indisponível</span>
+    </div>
+  </div>
+}
+

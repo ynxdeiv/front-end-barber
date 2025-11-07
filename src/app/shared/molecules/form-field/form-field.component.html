@@ -1,0 +1,14 @@
+<label class="flex flex-col">
+  @if (label) {
+    <app-label [for]="name">{{ label }}</app-label>
+  }
+  <app-input
+    [type]="type"
+    [placeholder]="placeholder"
+    [name]="name"
+    [disabled]="disabled"
+    [value]="value"
+    (valueChange)="onValueChange($event)"
+  ></app-input>
+</label>
+
