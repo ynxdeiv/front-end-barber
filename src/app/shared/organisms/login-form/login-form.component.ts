@@ -35,7 +35,9 @@ export class LoginFormComponent {
     this.togglePassword.emit();
   }
 
-  onSubmit() {
+  onSubmit(event: Event) {
+    event.preventDefault();
+    event.stopPropagation();
     this.submit.emit({ email: this.email, password: this.password });
   }
 

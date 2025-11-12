@@ -4,7 +4,7 @@
     <p class="text-text-muted-dark dark:text-text-muted-light text-sm sm:text-base font-normal leading-normal">Preencha os campos abaixo para começar.</p>
   </div>
 
-  <form class="flex flex-col gap-4" (ngSubmit)="onSubmit()">
+  <form class="flex flex-col gap-4" (ngSubmit)="onSubmit($event)">
     <app-form-field
       label="Nome"
       type="text"
