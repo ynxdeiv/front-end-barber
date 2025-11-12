@@ -36,7 +36,6 @@ export class LoginPageComponent {
   }
 
   onLoginSubmit(data: { email: string; password: string }) {
-    console.log('Login:', data);
     const { email, password } = data;
     const valido = this.usuarioRepo.validarLogin(email, password);
 

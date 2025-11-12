@@ -31,7 +31,6 @@ export class SignupPageComponent {
   }
 
   onSignupSubmit(data: { id: number; name: string; email: string; phone: string; password: string  }) {
-      console.log('Signup:', data);
       const result = this.usuarioRepo.cadastrar(data);
       alert(result);
   }

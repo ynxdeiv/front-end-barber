@@ -3,7 +3,7 @@
   [disabled]="disabled"
   [class]="'app-button app-button--' + variant + ' app-button--' + size + (fullWidth ? ' app-button--full' : '')"
   [attr.disabled]="disabled ? '' : null"
-  (click)="$event.stopPropagation()">
+  (click)="onClick($event)">
   <ng-content></ng-content>
 </button>
 

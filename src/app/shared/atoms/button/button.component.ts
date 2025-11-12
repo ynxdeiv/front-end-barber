@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 @Component({
@@ -14,5 +14,13 @@ export class ButtonComponent {
   @Input() size: 'sm' | 'md' | 'lg' = 'md';
   @Input() fullWidth = false;
   @Input() disabled = false;
+  @Output() click = new EventEmitter<MouseEvent>();
+
+  onClick(event: MouseEvent): void {
+    if (!this.disabled) {
+      event.stopPropagation();
+      this.click.emit(event);
+    }
+  }
 }
 

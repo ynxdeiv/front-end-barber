@@ -22,13 +22,16 @@
           <div class="h-12 w-full"></div>
         } @else {
           <button 
-            class="h-12 w-full text-text-dark dark:text-text-light text-sm font-medium leading-normal hover:bg-background-light dark:hover:bg-input-bg-dark rounded-full"
+            class="h-12 w-full text-text-dark dark:text-text-light text-sm font-medium leading-normal hover:bg-background-light dark:hover:bg-input-bg-dark rounded-full relative"
             [class.bg-primary]="isSelected(day)"
             [class.dark\:bg-primary]="isSelected(day)"
             [class.text-pearl-white]="isSelected(day)"
             [class.dark\:text-pearl-white]="isSelected(day)"
             (click)="selectDay(day)">
             <div class="flex size-full items-center justify-center">{{ day }}</div>
+            @if (hasAppointments(day) && !isSelected(day)) {
+              <div class="absolute bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-primary-accent"></div>
+            }
           </button>
         }
       }
