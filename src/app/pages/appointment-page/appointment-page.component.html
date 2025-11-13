@@ -1,47 +1,200 @@
 <app-dashboard-template>
   <div class="p-4 sm:p-6 md:p-8">
+    <!-- Header -->
     <div class="flex flex-wrap justify-between gap-3 mb-6 md:mb-8">
       <div class="flex flex-col gap-2">
-        <p class="text-text-dark dark:text-text-light text-2xl sm:text-3xl md:text-4xl font-black leading-tight tracking-[-0.033em]">Agendar um Horário</p>
-        <p class="text-text-muted-dark dark:text-text-muted-light text-sm sm:text-base font-normal leading-normal">Selecione um dia para ver e agendar os horários disponíveis.</p>
+        <h1 class="text-text-dark dark:text-text-light text-2xl sm:text-3xl md:text-4xl font-black leading-tight tracking-[-0.033em]">
+          Agendar um Horário
+        </h1>
+        <p class="text-text-muted-dark dark:text-text-muted-light text-sm sm:text-base font-normal leading-normal">
+          Escolha data, horário e serviço para seu agendamento
+        </p>
       </div>
+      <app-button
+        type="button"
+        variant="outline"
+        size="md"
+        routerLink="/my-appointments">
+        <app-icon name="event_note" size="sm"></app-icon>
+        Meus Agendamentos
+      </app-button>
     </div>
 
-    @if (showSuccessMessage || showErrorMessage) {
+    <!-- Progress Indicator -->
+    <app-appointment-progress [currentStep]="currentStep()"></app-appointment-progress>
+
+    <!-- Messages -->
+    @if (showSuccessMessage() || showErrorMessage()) {
       <div 
         class="mb-6 p-4 rounded-lg border flex items-center gap-3 transition-all duration-300"
-        [class.bg-green-50]="showSuccessMessage"
-        [class.dark:bg-green-900/20]="showSuccessMessage"
-        [class.border-green-200]="showSuccessMessage"
-        [class.dark:border-green-800]="showSuccessMessage"
-        [class.text-green-800]="showSuccessMessage"
-        [class.dark:text-green-200]="showSuccessMessage"
-        [class.bg-red-50]="showErrorMessage"
-        [class.dark:bg-red-900/20]="showErrorMessage"
-        [class.border-red-200]="showErrorMessage"
-        [class.dark:border-red-800]="showErrorMessage"
-        [class.text-red-800]="showErrorMessage"
-        [class.dark:text-red-200]="showErrorMessage">
+        [class.bg-green-50]="showSuccessMessage()"
+        [class.dark:bg-green-900/20]="showSuccessMessage()"
+        [class.border-green-200]="showSuccessMessage()"
+        [class.dark:border-green-800]="showSuccessMessage()"
+        [class.text-green-800]="showSuccessMessage()"
+        [class.dark:text-green-200]="showSuccessMessage()"
+        [class.bg-red-50]="showErrorMessage()"
+        [class.dark:bg-red-900/20]="showErrorMessage()"
+        [class.border-red-200]="showErrorMessage()"
+        [class.dark:border-red-800]="showErrorMessage()"
+        [class.text-red-800]="showErrorMessage()"
+        [class.dark:text-red-200]="showErrorMessage()">
         <app-icon 
-          [name]="showSuccessMessage ? 'check_circle' : 'error'"
+          [name]="showSuccessMessage() ? 'check_circle' : 'error'"
           size="md">
         </app-icon>
-        <p class="text-sm font-medium">{{ message }}</p>
+        <p class="text-sm font-medium">{{ message() }}</p>
       </div>
     }
 
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6 lg:gap-8">
-      <app-calendar 
-        [selectedDate]="selectedDate"
-        [refreshTrigger]="refreshTrigger"
-        (dateSelected)="onDateSelected($event)">
-      </app-calendar>
-      <app-time-slot-list 
-        [selectedDate]="selectedDate"
-        [refreshTrigger]="refreshTrigger"
-        (scheduleAppointment)="onScheduleAppointment($event)">
-      </app-time-slot-list>
-    </div>
+    <!-- Step 1: Seleção de Data e Horário -->
+    @if (currentStep() === 'date') {
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6 lg:gap-8">
+        <app-calendar 
+          [selectedDate]="selectedDate()"
+          [refreshTrigger]="refreshTrigger()"
+          (dateSelected)="onDateSelected($event)">
+        </app-calendar>
+        <div class="lg:col-span-2">
+          <app-time-slot-list 
+            [selectedDate]="selectedDate()"
+            [refreshTrigger]="refreshTrigger()"
+            (scheduleAppointment)="onTimeSelected($event.time)">
+          </app-time-slot-list>
+        </div>
+      </div>
+    }
+
+    <!-- Step 2: Seleção de Serviço -->
+    @if (currentStep() === 'service') {
+      <div class="max-w-4xl mx-auto">
+        <div class="mb-6">
+          <div class="flex items-center justify-between mb-4">
+            <div>
+              <h2 class="text-xl font-bold text-text-dark dark:text-text-light">
+                Data e Horário Selecionados
+              </h2>
+              <p class="text-sm text-text-muted-dark dark:text-text-muted-light">
+                {{ formatDate(selectedDate()) }} às {{ selectedTime() }}
+              </p>
+            </div>
+            <app-button
+              type="button"
+              variant="outline"
+              size="sm"
+              (click)="goBack()">
+              Alterar
+            </app-button>
+          </div>
+        </div>
+        <app-service-selection-step
+          [services]="services"
+          [selectedServiceId]="selectedService()?.id"
+          (serviceSelected)="onServiceSelected($event)">
+        </app-service-selection-step>
+      </div>
+    }
+
+    <!-- Step 3: Confirmação -->
+    @if (currentStep() === 'confirm') {
+      <div class="max-w-2xl mx-auto">
+        <div class="mb-6">
+          <div class="flex items-center justify-between mb-4">
+            <h2 class="text-xl font-bold text-text-dark dark:text-text-light">
+              Confirmar Agendamento
+            </h2>
+            <app-button
+              type="button"
+              variant="outline"
+              size="sm"
+              (click)="goBack()">
+              Voltar
+            </app-button>
+          </div>
+        </div>
+
+        <app-card padding="lg" class="mb-6">
+          <div class="flex flex-col gap-4">
+            <h3 class="text-lg font-semibold text-text-dark dark:text-text-light mb-4">
+              Resumo do Agendamento
+            </h3>
+
+            <div class="space-y-3">
+              <div class="flex items-center justify-between py-2 border-b border-border-light dark:border-border-dark">
+                <span class="text-sm text-text-muted-dark dark:text-text-muted-light">Data:</span>
+                <span class="text-base font-medium text-text-dark dark:text-text-light">
+                  {{ formatDate(selectedDate()!) }}
+                </span>
+              </div>
+
+              <div class="flex items-center justify-between py-2 border-b border-border-light dark:border-border-dark">
+                <span class="text-sm text-text-muted-dark dark:text-text-muted-light">Horário:</span>
+                <span class="text-base font-medium text-text-dark dark:text-text-light">
+                  {{ selectedTime() }}
+                </span>
+              </div>
+
+              <div class="flex items-center justify-between py-2 border-b border-border-light dark:border-border-dark">
+                <span class="text-sm text-text-muted-dark dark:text-text-muted-light">Serviço:</span>
+                <span class="text-base font-medium text-text-dark dark:text-text-light">
+                  {{ selectedService()?.name }}
+                </span>
+              </div>
+
+              <div class="flex items-center justify-between py-2 border-b border-border-light dark:border-border-dark">
+                <span class="text-sm text-text-muted-dark dark:text-text-muted-light">Duração:</span>
+                <span class="text-base font-medium text-text-dark dark:text-text-light">
+                  {{ selectedService()?.duration }} minutos
+                </span>
+              </div>
+
+              <div class="flex items-center justify-between pt-2">
+                <span class="text-lg font-semibold text-text-dark dark:text-text-light">Total:</span>
+                <app-price-tag [price]="getTotalPrice()" size="lg"></app-price-tag>
+              </div>
+            </div>
+          </div>
+        </app-card>
+
+        <div class="flex gap-3">
+          <app-button
+            type="button"
+            variant="outline"
+            size="lg"
+            [fullWidth]="true"
+            (click)="goBack()">
+            Voltar
+          </app-button>
+          <app-button
+            type="button"
+            variant="secondary"
+            size="lg"
+            [fullWidth]="true"
+            (click)="onConfirmAppointment()">
+            <app-icon name="check_circle" size="sm"></app-icon>
+            Confirmar Agendamento
+          </app-button>
+        </div>
+      </div>
+    }
+
+    <!-- Modal de Pagamento -->
+    @if (createdAppointment() && showPaymentModal()) {
+      <app-post-appointment-payment-modal
+        [appointment]="createdAppointment()!"
+        [service]="selectedService() || undefined"
+        [isOpen]="showPaymentModal()"
+        (close)="onClosePaymentModal()"
+        (paymentProcessed)="onPaymentProcessed($event)">
+      </app-post-appointment-payment-modal>
+    }
+
+    <!-- Tela de Sucesso -->
+    @if (createdAppointment() && showSuccessScreen()) {
+      <app-payment-success-screen
+        [appointment]="createdAppointment()!"
+        (close)="onCloseSuccessScreen()">
+      </app-payment-success-screen>
+    }
   </div>
 </app-dashboard-template>
-

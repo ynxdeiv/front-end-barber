@@ -1,0 +1,70 @@
+<div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+  <div class="relative w-full max-w-md bg-background-light dark:bg-background-dark rounded-lg shadow-xl">
+    <div class="p-8 text-center">
+      <!-- Ícone de Sucesso -->
+      <div class="flex items-center justify-center mb-6">
+        <div class="rounded-full bg-green-100 dark:bg-green-900/30 size-20 flex items-center justify-center">
+          <app-icon name="check_circle" size="xl" class="text-green-600 dark:text-green-400"></app-icon>
+        </div>
+      </div>
+
+      <!-- Título -->
+      <h2 class="text-2xl font-bold text-text-dark dark:text-text-light mb-2">
+        Pagamento Confirmado!
+      </h2>
+      <p class="text-sm text-text-muted-dark dark:text-text-muted-light mb-6">
+        Seu agendamento foi confirmado com sucesso
+      </p>
+
+      <!-- Detalhes do Agendamento -->
+      <app-card padding="md" class="mb-6 text-left">
+        <div class="flex flex-col gap-3">
+          <div class="flex items-center justify-between">
+            <span class="text-sm text-text-muted-dark dark:text-text-muted-light">Serviço:</span>
+            <span class="text-base font-semibold text-text-dark dark:text-text-light">
+              {{ appointment.serviceName }}
+            </span>
+          </div>
+          <div class="flex items-center justify-between">
+            <span class="text-sm text-text-muted-dark dark:text-text-muted-light">Data:</span>
+            <span class="text-base font-medium text-text-dark dark:text-text-light">
+              {{ formatDate(appointment.date) }}
+            </span>
+          </div>
+          <div class="flex items-center justify-between">
+            <span class="text-sm text-text-muted-dark dark:text-text-muted-light">Horário:</span>
+            <span class="text-base font-medium text-text-dark dark:text-text-light">
+              {{ appointment.time }}
+            </span>
+          </div>
+          <div class="pt-3 border-t border-border-light dark:border-border-dark">
+            <app-badge variant="success" size="sm">
+              Confirmado
+            </app-badge>
+          </div>
+        </div>
+      </app-card>
+
+      <!-- Botões -->
+      <div class="flex flex-col gap-3">
+        <app-button
+          type="button"
+          variant="secondary"
+          size="lg"
+          [fullWidth]="true"
+          (click)="onClose()">
+          Ver Meus Agendamentos
+        </app-button>
+        <app-button
+          type="button"
+          variant="outline"
+          size="lg"
+          [fullWidth]="true"
+          (click)="goToHome()">
+          Voltar ao Início
+        </app-button>
+      </div>
+    </div>
+  </div>
+</div>
+

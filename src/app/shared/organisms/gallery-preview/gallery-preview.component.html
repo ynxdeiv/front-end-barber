@@ -1,0 +1,32 @@
+<section class="py-16 bg-background-light dark:bg-background-dark">
+  <div class="container mx-auto px-4">
+    <div class="text-center mb-12">
+      <h2 class="text-3xl md:text-4xl font-bold text-text-dark dark:text-text-light mb-4">
+        {{ title }}
+      </h2>
+      <p class="text-lg text-text-muted-dark dark:text-text-muted-light max-w-2xl mx-auto">
+        {{ subtitle }}
+      </p>
+    </div>
+
+    @if (items.length > 0) {
+      <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-4">
+        @for (item of items.slice(0, maxItems); track $index) {
+          <app-work-gallery-item
+            [imageUrl]="item.imageUrl"
+            [imageAlt]="item.imageAlt"
+            [title]="item.title"
+            [description]="item.description">
+          </app-work-gallery-item>
+        }
+      </div>
+    } @else {
+      <div class="text-center py-12">
+        <p class="text-text-muted-dark dark:text-text-muted-light">
+          Galeria em breve.
+        </p>
+      </div>
+    }
+  </div>
+</section>
+

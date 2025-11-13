@@ -1,0 +1,154 @@
+<div class="flex flex-col gap-4">
+  <div>
+    <h3 class="text-lg font-semibold text-text-dark dark:text-text-light mb-2">
+      Dados do Cartão
+    </h3>
+    <p class="text-sm text-text-muted-dark dark:text-text-muted-light">
+      Preencha os dados do cartão de crédito
+    </p>
+  </div>
+
+  <form (ngSubmit)="onSubmit()" class="flex flex-col gap-4">
+    <!-- Número do Cartão -->
+    <div class="flex flex-col gap-2">
+      <label class="text-sm font-medium text-text-dark dark:text-text-light">
+        Número do Cartão
+      </label>
+      <input
+        type="text"
+        [(ngModel)]="cardData.number"
+        (input)="onCardNumberInput($event)"
+        (blur)="validateCardNumber()"
+        placeholder="1234 5678 9012 3456"
+        maxlength="19"
+        [class.border-red-500]="errors()['number']"
+        class="w-full px-4 py-2 rounded-lg border border-border-light dark:border-border-dark bg-input-bg-light dark:bg-input-bg-dark text-text-dark dark:text-text-light focus:outline-none focus:ring-2 focus:ring-primary">
+      @if (errors()['number']) {
+        <span class="text-xs text-red-600 dark:text-red-400">{{ errors()['number'] }}</span>
+      }
+    </div>
+
+    <!-- Nome do Titular -->
+    <div class="flex flex-col gap-2">
+      <label class="text-sm font-medium text-text-dark dark:text-text-light">
+        Nome do Titular
+      </label>
+      <input
+        type="text"
+        [(ngModel)]="cardData.name"
+        (blur)="validateName()"
+        placeholder="NOME COMO ESTÁ NO CARTÃO"
+        [class.border-red-500]="errors()['name']"
+        class="w-full px-4 py-2 rounded-lg border border-border-light dark:border-border-dark bg-input-bg-light dark:bg-input-bg-dark text-text-dark dark:text-text-light focus:outline-none focus:ring-2 focus:ring-primary uppercase">
+      @if (errors()['name']) {
+        <span class="text-xs text-red-600 dark:text-red-400">{{ errors()['name'] }}</span>
+      }
+    </div>
+
+    <!-- Data e CVV -->
+    <div class="grid grid-cols-2 gap-4">
+      <div class="flex flex-col gap-2">
+        <label class="text-sm font-medium text-text-dark dark:text-text-light">
+          Validade
+        </label>
+        <input
+          type="text"
+          [(ngModel)]="cardData.expiry"
+          (input)="onExpiryInput($event)"
+          (blur)="validateExpiry()"
+          placeholder="MM/AA"
+          maxlength="5"
+          [class.border-red-500]="errors()['expiry']"
+          class="w-full px-4 py-2 rounded-lg border border-border-light dark:border-border-dark bg-input-bg-light dark:bg-input-bg-dark text-text-dark dark:text-text-light focus:outline-none focus:ring-2 focus:ring-primary">
+        @if (errors()['expiry']) {
+          <span class="text-xs text-red-600 dark:text-red-400">{{ errors()['expiry'] }}</span>
+        }
+      </div>
+
+      <div class="flex flex-col gap-2">
+        <label class="text-sm font-medium text-text-dark dark:text-text-light">
+          CVV
+        </label>
+        <input
+          type="text"
+          [(ngModel)]="cardData.cvv"
+          (input)="onCVVInput($event)"
+          (blur)="validateCVV()"
+          placeholder="123"
+          maxlength="4"
+          [class.border-red-500]="errors()['cvv']"
+          class="w-full px-4 py-2 rounded-lg border border-border-light dark:border-border-dark bg-input-bg-light dark:bg-input-bg-dark text-text-dark dark:text-text-light focus:outline-none focus:ring-2 focus:ring-primary">
+        @if (errors()['cvv']) {
+          <span class="text-xs text-red-600 dark:text-red-400">{{ errors()['cvv'] }}</span>
+        }
+      </div>
+    </div>
+
+    <!-- CPF (Opcional) -->
+    <div class="flex flex-col gap-2">
+      <label class="text-sm font-medium text-text-dark dark:text-text-light">
+        CPF do Titular (Opcional)
+      </label>
+      <input
+        type="text"
+        [(ngModel)]="cardData.cpf"
+        (input)="onCPFInput($event)"
+        (blur)="validateCPF()"
+        placeholder="000.000.000-00"
+        maxlength="14"
+        [class.border-red-500]="errors()['cpf']"
+        class="w-full px-4 py-2 rounded-lg border border-border-light dark:border-border-dark bg-input-bg-light dark:bg-input-bg-dark text-text-dark dark:text-text-light focus:outline-none focus:ring-2 focus:ring-primary">
+      @if (errors()['cpf']) {
+        <span class="text-xs text-red-600 dark:text-red-400">{{ errors()['cpf'] }}</span>
+      }
+    </div>
+
+    <!-- Parcelas -->
+    <div class="flex flex-col gap-2">
+      <label class="text-sm font-medium text-text-dark dark:text-text-light">
+        Parcelas
+      </label>
+      <select
+        [(ngModel)]="cardData.installments"
+        name="installments"
+        class="w-full px-4 py-2 rounded-lg border border-border-light dark:border-border-dark bg-input-bg-light dark:bg-input-bg-dark text-text-dark dark:text-text-light focus:outline-none focus:ring-2 focus:ring-primary">
+        @for (installment of installments; track installment) {
+          <option [value]="installment">
+            {{ installment }}x de R$ {{ getInstallmentValue().toFixed(2) }} sem juros
+          </option>
+        }
+      </select>
+    </div>
+
+    <!-- Botões -->
+    <div class="flex gap-3 pt-2">
+      <app-button
+        type="button"
+        variant="outline"
+        size="lg"
+        [fullWidth]="true"
+        (click)="onCancel()">
+        Cancelar
+      </app-button>
+      <app-button
+        type="submit"
+        variant="secondary"
+        size="lg"
+        [fullWidth]="true"
+        [disabled]="!isFormValid() || isSubmitting()">
+        @if (isSubmitting()) {
+          <span class="flex items-center gap-2">
+            <app-icon name="hourglass_empty" size="sm" class="animate-spin"></app-icon>
+            Processando...
+          </span>
+        } @else {
+          <span class="flex items-center gap-2">
+            <app-icon name="payment" size="sm"></app-icon>
+            Pagar R$ {{ amount.toFixed(2) }}
+          </span>
+        }
+      </app-button>
+    </div>
+  </form>
+</div>
+

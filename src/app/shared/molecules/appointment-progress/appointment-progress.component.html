@@ -1,0 +1,33 @@
+<div class="flex items-center justify-between mb-6">
+  @for (step of steps; track step.key; let i = $index) {
+    <div class="flex items-center flex-1">
+      <div class="flex flex-col items-center flex-1">
+        <div
+          [class]="'flex items-center justify-center rounded-full size-10 border-2 transition-all ' + 
+            (isCurrent(step.key) ? 'bg-primary border-primary text-pearl-white' : 
+             isCompleted(step.key) ? 'bg-green-500 border-green-500 text-pearl-white' : 
+             'bg-transparent border-border-light dark:border-border-dark text-text-muted-dark dark:text-text-muted-light')">
+          @if (isCompleted(step.key)) {
+            <app-icon name="check" size="sm"></app-icon>
+          } @else {
+            <app-icon [name]="step.icon" size="sm"></app-icon>
+          }
+        </div>
+        <span
+          [class]="'mt-2 text-xs font-medium text-center ' +
+            (isCurrent(step.key) || isCompleted(step.key) ? 
+             'text-text-dark dark:text-text-light' : 
+             'text-text-muted-dark dark:text-text-muted-light')">
+          {{ step.label }}
+        </span>
+      </div>
+      @if (i < steps.length - 1) {
+        <div
+          [class]="'flex-1 h-0.5 mx-2 ' +
+            (isCompleted(step.key) ? 'bg-green-500' : 'bg-border-light dark:bg-border-dark')">
+        </div>
+      }
+    </div>
+  }
+</div>
+

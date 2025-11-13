@@ -1,0 +1,269 @@
+<app-dashboard-template>
+  <div class="flex flex-col gap-6 p-4 sm:p-6 md:p-8">
+    <!-- Header -->
+    <div class="flex flex-wrap justify-between gap-4">
+      <div>
+        <h1 class="text-2xl sm:text-3xl md:text-4xl font-black text-text-dark dark:text-text-light mb-2">
+          Meus Agendamentos
+        </h1>
+        <p class="text-sm text-text-muted-dark dark:text-text-muted-light">
+          Gerencie seus agendamentos, cancele ou remarque quando necessário
+        </p>
+      </div>
+      <app-button
+        type="button"
+        variant="secondary"
+        size="lg"
+        (click)="goToNewAppointment()">
+        <app-icon name="add" size="sm"></app-icon>
+        Novo Agendamento
+      </app-button>
+    </div>
+
+    <!-- Filtros -->
+    <div class="flex flex-wrap gap-2">
+      <app-button
+        type="button"
+        variant="outline"
+        size="sm"
+        [class.bg-primary/20]="filterStatus() === 'all'"
+        (click)="onFilterChange('all')">
+        Todos
+      </app-button>
+      <app-button
+        type="button"
+        variant="outline"
+        size="sm"
+        [class.bg-primary/20]="filterStatus() === 'confirmed'"
+        (click)="onFilterChange('confirmed')">
+        Confirmados
+      </app-button>
+      <app-button
+        type="button"
+        variant="outline"
+        size="sm"
+        [class.bg-primary/20]="filterStatus() === 'pending_payment'"
+        (click)="onFilterChange('pending_payment')">
+        Pendentes
+      </app-button>
+      <app-button
+        type="button"
+        variant="outline"
+        size="sm"
+        [class.bg-primary/20]="filterStatus() === 'completed'"
+        (click)="onFilterChange('completed')">
+        Concluídos
+      </app-button>
+      <app-button
+        type="button"
+        variant="outline"
+        size="sm"
+        [class.bg-primary/20]="filterStatus() === 'cancelled'"
+        (click)="onFilterChange('cancelled')">
+        Cancelados
+      </app-button>
+    </div>
+
+    <!-- Lista de Agendamentos -->
+    @if (filteredAppointments().length === 0) {
+      <app-card padding="lg" class="text-center py-12">
+        <app-icon name="event_busy" size="xl" class="text-text-muted-dark dark:text-text-muted-light mx-auto mb-4"></app-icon>
+        <p class="text-lg font-medium text-text-dark dark:text-text-light mb-2">
+          Nenhum agendamento encontrado
+        </p>
+        <p class="text-sm text-text-muted-dark dark:text-text-muted-light mb-6">
+          @if (filterStatus() === 'all') {
+            Você ainda não possui agendamentos. Crie um novo agendamento para começar.
+          } @else {
+            Nenhum agendamento com este status.
+          }
+        </p>
+        @if (filterStatus() !== 'all') {
+          <app-button
+            type="button"
+            variant="outline"
+            size="md"
+            (click)="onFilterChange('all')">
+            Ver Todos
+          </app-button>
+        }
+      </app-card>
+    } @else {
+      <div class="grid grid-cols-1 gap-4">
+        @for (appointment of filteredAppointments(); track appointment.id) {
+          <app-card padding="md" class="hover:shadow-lg transition-shadow">
+            <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+              <!-- Informações do Agendamento -->
+              <div class="flex-1">
+                <div class="flex items-start gap-4 mb-3">
+                  <div class="flex items-center justify-center rounded-lg bg-primary/10 dark:bg-primary/20 size-12 shrink-0">
+                    <app-icon name="calendar_month" size="md" class="text-primary dark:text-primary-accent"></app-icon>
+                  </div>
+                  <div class="flex-1">
+                    <div class="flex items-center gap-3 mb-2">
+                      <h3 class="text-lg font-semibold text-text-dark dark:text-text-light">
+                        {{ appointment.serviceName || 'Serviço não especificado' }}
+                      </h3>
+                      <app-badge [variant]="getStatusVariant(appointment.status)">
+                        {{ getStatusLabel(appointment.status) }}
+                      </app-badge>
+                    </div>
+                    <div class="flex flex-wrap gap-4 text-sm text-text-muted-dark dark:text-text-muted-light">
+                      <div class="flex items-center gap-2">
+                        <app-icon name="event" size="sm"></app-icon>
+                        <span>{{ formatDate(appointment.date) }}</span>
+                      </div>
+                      <div class="flex items-center gap-2">
+                        <app-icon name="schedule" size="sm"></app-icon>
+                        <span>{{ appointment.time }}</span>
+                      </div>
+                      @if (appointment.servicePrice) {
+                        <div class="flex items-center gap-2">
+                          <app-icon name="attach_money" size="sm"></app-icon>
+                          <app-price-tag [price]="appointment.servicePrice" size="sm"></app-price-tag>
+                        </div>
+                      }
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Ações -->
+              <div class="flex flex-wrap gap-2 md:flex-col md:items-end">
+                @if (canPay(appointment)) {
+                  <app-button
+                    type="button"
+                    variant="secondary"
+                    size="sm"
+                    (click)="onPay(appointment)">
+                    <app-icon name="payment" size="sm"></app-icon>
+                    Pagar Agora
+                  </app-button>
+                }
+                @if (canReschedule(appointment)) {
+                  <app-button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    (click)="onReschedule(appointment)">
+                    <app-icon name="edit_calendar" size="sm"></app-icon>
+                    Remarcar
+                  </app-button>
+                }
+                @if (canCancel(appointment)) {
+                  <app-button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    (click)="onCancel(appointment)">
+                    <app-icon name="cancel" size="sm"></app-icon>
+                    Cancelar
+                  </app-button>
+                }
+              </div>
+            </div>
+          </app-card>
+        }
+      </div>
+    }
+
+    <!-- Modal de Remarcação -->
+    @if (showRescheduleModal()) {
+      <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm" (click)="cancelReschedule()">
+        <div class="relative w-full max-w-4xl bg-background-light dark:bg-background-dark rounded-lg shadow-xl max-h-[90vh] overflow-y-auto" (click)="$event.stopPropagation()">
+          <div class="p-6">
+            <!-- Header -->
+            <div class="flex items-center justify-between mb-6">
+              <h2 class="text-2xl font-bold text-text-dark dark:text-text-light">
+                Remarcar Agendamento
+              </h2>
+              <button
+                (click)="cancelReschedule()"
+                class="flex items-center justify-center size-8 rounded-lg hover:bg-input-bg-light dark:hover:bg-input-bg-dark transition-colors">
+                <app-icon name="close" size="md" class="text-text-muted-dark dark:text-text-muted-light"></app-icon>
+              </button>
+            </div>
+
+            <!-- Conteúdo do Modal -->
+            <div class="space-y-6">
+              <!-- Seleção de Data -->
+              <div>
+                <h3 class="text-lg font-semibold text-text-dark dark:text-text-light mb-4">
+                  Nova Data
+                </h3>
+                @if (rescheduleDate()) {
+                  <app-calendar
+                    [selectedDate]="rescheduleDate()!"
+                    [refreshTrigger]="refreshTrigger()"
+                    (dateSelected)="onRescheduleDateSelected($event)">
+                  </app-calendar>
+                }
+              </div>
+
+              <!-- Seleção de Horário -->
+              @if (rescheduleDate()) {
+                <div>
+                  <h3 class="text-lg font-semibold text-text-dark dark:text-text-light mb-4">
+                    Novo Horário
+                  </h3>
+                  <app-time-slot-list
+                    [selectedDate]="rescheduleDate()!"
+                    [refreshTrigger]="refreshTrigger()"
+                    (scheduleAppointment)="onRescheduleTimeSelected($event.time)">
+                  </app-time-slot-list>
+                </div>
+              }
+
+              <!-- Seleção de Serviço -->
+              @if (rescheduleTime()) {
+                <div>
+                  <h3 class="text-lg font-semibold text-text-dark dark:text-text-light mb-4">
+                    Serviço
+                  </h3>
+                  <app-service-selection-step
+                    [services]="services"
+                    [selectedServiceId]="rescheduleService()?.id"
+                    (serviceSelected)="onRescheduleServiceSelected($event)">
+                  </app-service-selection-step>
+                </div>
+              }
+
+              <!-- Botões -->
+              <div class="flex gap-3 pt-4 border-t border-border-light dark:border-border-dark">
+                <app-button
+                  type="button"
+                  variant="outline"
+                  size="lg"
+                  [fullWidth]="true"
+                  (click)="cancelReschedule()">
+                  Cancelar
+                </app-button>
+                <app-button
+                  type="button"
+                  variant="secondary"
+                  size="lg"
+                  [fullWidth]="true"
+                  [disabled]="!rescheduleDate() || !rescheduleTime() || !rescheduleService()"
+                  (click)="confirmReschedule()">
+                  Confirmar Remarcação
+                </app-button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    }
+
+    <!-- Modal de Pagamento -->
+    @if (showPaymentModal() && appointmentToPay()) {
+      <app-post-appointment-payment-modal
+        [appointment]="appointmentToPay()!"
+        [service]="serviceToPay() || undefined"
+        [isOpen]="showPaymentModal()"
+        (close)="onClosePaymentModal()"
+        (paymentProcessed)="onPaymentProcessed($event)">
+      </app-post-appointment-payment-modal>
+    }
+  </div>
+</app-dashboard-template>
+

@@ -1,0 +1,63 @@
+<section 
+  class="relative min-h-[600px] md:min-h-[700px] flex items-center justify-center overflow-hidden bg-gradient-to-br from-primary via-primary-darker to-primary">
+  
+  <!-- Background Image -->
+  @if (backgroundImage) {
+    <div class="absolute inset-0 opacity-30">
+      <img 
+        [src]="backgroundImage" 
+        alt="Barbearia profissional" 
+        class="w-full h-full object-cover animate-fade-in">
+    </div>
+  }
+  
+  <!-- Overlay Gradient -->
+  <div class="absolute inset-0 bg-gradient-to-b from-black/40 via-black/20 to-transparent"></div>
+
+  <!-- Content -->
+  <div class="relative z-10 container mx-auto px-4 py-16">
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center">
+      <!-- Text Content -->
+      <div class="text-center lg:text-left animate-slide-up">
+        <h1 class="text-4xl md:text-5xl lg:text-6xl font-black mb-4 leading-tight text-pearl-white animate-fade-in-delay">
+          {{ title }}
+        </h1>
+        <p class="text-xl md:text-2xl mb-2 font-medium text-primary-accent animate-fade-in-delay-2">
+          {{ subtitle }}
+        </p>
+        <p class="text-lg mb-8 max-w-xl mx-auto lg:mx-0 opacity-90 text-pearl-white animate-fade-in-delay-3">
+          {{ description }}
+        </p>
+        <div class="animate-fade-in-delay-4">
+          <app-button
+            type="button"
+            variant="secondary"
+            size="lg"
+            (click)="onCtaClick()">
+            <app-icon name="calendar_month" size="md"></app-icon>
+            {{ ctaText }}
+          </app-button>
+        </div>
+      </div>
+
+      <!-- Hero Image -->
+      <div class="relative animate-slide-in-right">
+        <div class="relative rounded-2xl overflow-hidden shadow-2xl transform hover:scale-105 transition-transform duration-500">
+          <img 
+            [src]="heroImage" 
+            [alt]="heroImageAlt"
+            class="w-full h-[500px] md:h-[600px] object-cover">
+          <div class="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
+        </div>
+        <!-- Decorative Elements -->
+        <div class="absolute -top-4 -right-4 size-24 bg-primary-accent/20 rounded-full blur-2xl animate-pulse"></div>
+        <div class="absolute -bottom-4 -left-4 size-32 bg-primary/30 rounded-full blur-3xl animate-pulse delay-1000"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scroll Indicator -->
+  <div class="absolute bottom-8 left-1/2 transform -translate-x-1/2 animate-bounce">
+    <app-icon name="keyboard_arrow_down" size="lg" class="text-pearl-white opacity-70"></app-icon>
+  </div>
+</section>

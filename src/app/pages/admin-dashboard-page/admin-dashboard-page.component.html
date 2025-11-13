@@ -1,0 +1,63 @@
+<app-dashboard-template>
+  <div class="p-4 sm:p-6 md:p-8">
+    <!-- Header -->
+    <div class="flex flex-wrap justify-between gap-3 mb-6 md:mb-8">
+      <div class="flex flex-col gap-2">
+        <h1 class="text-text-dark dark:text-text-light text-2xl sm:text-3xl md:text-4xl font-black leading-tight tracking-[-0.033em]">
+          Dashboard Administrativo
+        </h1>
+        <p class="text-text-muted-dark dark:text-text-muted-light text-sm sm:text-base font-normal leading-normal">
+          Bem-vindo, {{ adminUser?.name }}! Aqui está o resumo do seu negócio.
+        </p>
+      </div>
+      <button
+        (click)="refreshDashboard()"
+        class="flex items-center gap-2 px-4 py-2 rounded-lg bg-primary/10 dark:bg-primary/20 hover:bg-primary/20 dark:hover:bg-primary/30 text-primary dark:text-primary-accent transition-colors">
+        <app-icon name="refresh" size="sm"></app-icon>
+        <span class="text-sm font-medium">Atualizar</span>
+      </button>
+    </div>
+
+    @if (isLoading()) {
+      <!-- Loading State -->
+      <div class="flex items-center justify-center py-12">
+        <div class="flex flex-col items-center gap-4">
+          <app-icon name="hourglass_empty" size="xl" class="animate-spin text-primary dark:text-primary-accent"></app-icon>
+          <p class="text-sm text-text-muted-dark dark:text-text-muted-light">
+            Carregando métricas...
+          </p>
+        </div>
+      </div>
+    } @else if (metrics()) {
+      <!-- Métricas -->
+      <div class="mb-8">
+        <app-metrics-dashboard [metrics]="metrics()!"></app-metrics-dashboard>
+      </div>
+
+      <!-- Grid de Conteúdo -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <!-- Agendamentos de Hoje -->
+        <div class="lg:col-span-2">
+          <app-today-appointments-list [appointments]="todayAppointments()"></app-today-appointments-list>
+        </div>
+
+        <!-- Resumo Financeiro -->
+        <div>
+          <app-financial-summary [metrics]="metrics()!"></app-financial-summary>
+        </div>
+      </div>
+
+    } @else {
+      <!-- Empty State -->
+      <div class="text-center py-12">
+        <app-icon name="dashboard" size="xl" class="text-text-muted-dark dark:text-text-muted-light mx-auto mb-4"></app-icon>
+        <p class="text-lg font-medium text-text-dark dark:text-text-light mb-2">
+          Nenhum dado disponível
+        </p>
+        <p class="text-sm text-text-muted-dark dark:text-text-muted-light">
+          Comece criando agendamentos para ver as métricas aqui.
+        </p>
+      </div>
+    }
+  </div>
+</app-dashboard-template>

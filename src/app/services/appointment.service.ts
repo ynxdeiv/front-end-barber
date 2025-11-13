@@ -1,5 +1,7 @@
 import { Injectable } from '@angular/core';
-import { Appointment } from '../models/appointment';
+import { Appointment, AppointmentStatus } from '../models/appointment';
+import { Service } from '../models/service';
+import { AuthService } from './auth.service';
 
 @Injectable({
   providedIn: 'root'
@@ -7,7 +9,7 @@ import { Appointment } from '../models/appointment';
 export class AppointmentService {
   private readonly STORAGE_KEY = 'barber_appointments';
 
-  constructor() {
+  constructor(private authService: AuthService) {
     // Inicializar storage se não existir
     if (!localStorage.getItem(this.STORAGE_KEY)) {
       localStorage.setItem(this.STORAGE_KEY, JSON.stringify([]));
@@ -36,6 +38,21 @@ export class AppointmentService {
     const allAppointments = this.getAllAppointments();
     const dateString = this.formatDate(date);
     return allAppointments.filter(apt => apt.date === dateString);
+  }
+
+  /**
+   * Obtém agendamentos de um usuário específico
+   */
+  getAppointmentsByUserId(userId: string): Appointment[] {
+    const allAppointments = this.getAllAppointments();
+    return allAppointments
+      .filter(apt => apt.userId === userId)
+      .sort((a, b) => {
+        // Ordenar por data e horário (mais recentes primeiro)
+        const dateA = new Date(a.date + 'T' + a.startTime);
+        const dateB = new Date(b.date + 'T' + b.startTime);
+        return dateB.getTime() - dateA.getTime();
+      });
   }
 
   /**
@@ -76,9 +93,21 @@ export class AppointmentService {
   }
 
   /**
-   * Cria um novo agendamento
+   * Cria um novo agendamento (método legado - mantido para compatibilidade)
    */
   createAppointment(date: Date, time: string, userId?: string): Appointment | null {
+    return this.createAppointmentWithService(date, time, undefined, userId);
+  }
+
+  /**
+   * Cria um novo agendamento com serviço selecionado
+   */
+  createAppointmentWithService(
+    date: Date,
+    time: string,
+    service?: Service,
+    userId?: string
+  ): Appointment | null {
     // Extrair startTime e endTime do formato "HH:MM - HH:MM"
     const [startTime, endTime] = time.split(' - ').map(t => t.trim());
     
@@ -92,6 +121,18 @@ export class AppointmentService {
       return null;
     }
 
+    // Buscar informações do usuário se userId foi fornecido
+    let userName: string | undefined;
+    let userEmail: string | undefined;
+    
+    if (userId) {
+      const user = this.authService.getAllUsersForAppointments().find(u => u.id.toString() === userId);
+      if (user) {
+        userName = user.name;
+        userEmail = user.email;
+      }
+    }
+
     const appointment: Appointment = {
       id: this.generateId(),
       date: this.formatDate(date),
@@ -99,6 +140,12 @@ export class AppointmentService {
       startTime,
       endTime,
       userId,
+      userName,
+      userEmail,
+      serviceId: service?.id,
+      serviceName: service?.name,
+      servicePrice: service?.price,
+      status: 'pending_payment', // Status inicial: aguardando pagamento
       createdAt: new Date().toISOString()
     };
 
@@ -107,6 +154,55 @@ export class AppointmentService {
     localStorage.setItem(this.STORAGE_KEY, JSON.stringify(allAppointments));
 
     return appointment;
+  }
+
+  /**
+   * Confirma agendamento após pagamento
+   */
+  confirmAppointment(appointmentId: string, paymentId?: string): boolean {
+    const allAppointments = this.getAllAppointments();
+    const appointment = allAppointments.find(apt => apt.id === appointmentId);
+    
+    if (!appointment) {
+      return false;
+    }
+
+    appointment.status = 'confirmed';
+    appointment.confirmedAt = new Date().toISOString();
+    if (paymentId) {
+      appointment.paymentId = paymentId;
+    }
+
+    localStorage.setItem(this.STORAGE_KEY, JSON.stringify(allAppointments));
+    return true;
+  }
+
+  /**
+   * Atualiza status de um agendamento
+   */
+  updateAppointmentStatus(appointmentId: string, status: AppointmentStatus): boolean {
+    const allAppointments = this.getAllAppointments();
+    const appointment = allAppointments.find(apt => apt.id === appointmentId);
+    
+    if (!appointment) {
+      return false;
+    }
+
+    appointment.status = status;
+    if (status === 'confirmed' && !appointment.confirmedAt) {
+      appointment.confirmedAt = new Date().toISOString();
+    }
+
+    localStorage.setItem(this.STORAGE_KEY, JSON.stringify(allAppointments));
+    return true;
+  }
+
+  /**
+   * Obtém agendamento por ID
+   */
+  getAppointmentById(id: string): Appointment | undefined {
+    const allAppointments = this.getAllAppointments();
+    return allAppointments.find(apt => apt.id === id);
   }
 
   /**
@@ -121,6 +217,39 @@ export class AppointmentService {
     }
 
     localStorage.setItem(this.STORAGE_KEY, JSON.stringify(filtered));
+    return true;
+  }
+
+  /**
+   * Cancela um agendamento (marca como cancelado ao invés de deletar)
+   */
+  cancelAppointment(id: string): boolean {
+    return this.updateAppointmentStatus(id, 'cancelled');
+  }
+
+  /**
+   * Remarca um agendamento (atualiza data e horário)
+   */
+  rescheduleAppointment(id: string, newDate: Date, newTime: string, newStartTime: string, newEndTime: string): boolean {
+    const allAppointments = this.getAllAppointments();
+    const appointment = allAppointments.find(apt => apt.id === id);
+    
+    if (!appointment) {
+      return false;
+    }
+
+    // Verificar se o novo horário está disponível
+    if (!this.isTimeSlotAvailable(newDate, newStartTime, newEndTime)) {
+      return false;
+    }
+
+    appointment.date = this.formatDate(newDate);
+    appointment.time = newTime;
+    appointment.startTime = newStartTime;
+    appointment.endTime = newEndTime;
+    appointment.status = 'pending_payment'; // Volta para pendente de pagamento se já estava confirmado
+
+    localStorage.setItem(this.STORAGE_KEY, JSON.stringify(allAppointments));
     return true;
   }
 

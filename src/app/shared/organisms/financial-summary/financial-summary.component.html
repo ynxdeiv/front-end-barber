@@ -1,0 +1,75 @@
+<app-card padding="md">
+  <div class="flex flex-col gap-4">
+    <h3 class="text-lg font-semibold text-text-dark dark:text-text-light">
+      Resumo Financeiro
+    </h3>
+
+    <div class="space-y-4">
+      <!-- Receita Mensal -->
+      <div class="flex items-center justify-between p-3 rounded-lg bg-success/10 dark:bg-success/20 border border-success/20">
+        <div class="flex items-center gap-3">
+          <div class="flex items-center justify-center rounded-lg size-10 bg-success/20 dark:bg-success/30">
+            <app-icon name="attach_money" size="sm" class="text-green-600 dark:text-green-400"></app-icon>
+          </div>
+          <div>
+            <p class="text-xs text-text-muted-dark dark:text-text-muted-light">Receita Mensal</p>
+            <app-price-tag [price]="metrics.monthlyRevenue" size="lg"></app-price-tag>
+          </div>
+        </div>
+        @if (metrics.revenueGrowth !== 0) {
+          <div class="flex items-center gap-1">
+            <app-icon [name]="revenueGrowthIcon" size="sm" [class]="revenueGrowthColor"></app-icon>
+            <span [class]="'text-sm font-medium ' + revenueGrowthColor">
+              {{ getRevenueGrowthAbs() }}%
+            </span>
+          </div>
+        }
+      </div>
+
+      <!-- Receita Hoje -->
+      <div class="flex items-center justify-between p-3 rounded-lg bg-primary/10 dark:bg-primary/20 border border-primary/20">
+        <div class="flex items-center gap-3">
+          <div class="flex items-center justify-center rounded-lg size-10 bg-primary/20 dark:bg-primary/30">
+            <app-icon name="today" size="sm" class="text-primary dark:text-primary-accent"></app-icon>
+          </div>
+          <div>
+            <p class="text-xs text-text-muted-dark dark:text-text-muted-light">Receita Hoje</p>
+            <app-price-tag [price]="metrics.todayRevenue" size="lg"></app-price-tag>
+          </div>
+        </div>
+      </div>
+
+      <!-- Ticket Médio -->
+      <div class="flex items-center justify-between p-3 rounded-lg bg-info/10 dark:bg-info/20 border border-info/20">
+        <div class="flex items-center gap-3">
+          <div class="flex items-center justify-center rounded-lg size-10 bg-info/20 dark:bg-info/30">
+            <app-icon name="receipt" size="sm" class="text-blue-600 dark:text-blue-400"></app-icon>
+          </div>
+          <div>
+            <p class="text-xs text-text-muted-dark dark:text-text-muted-light">Ticket Médio</p>
+            <app-price-tag [price]="metrics.averageTicket" size="lg"></app-price-tag>
+          </div>
+        </div>
+      </div>
+
+      <!-- Pagamentos Pendentes -->
+      <div class="flex items-center justify-between p-3 rounded-lg bg-warning/10 dark:bg-warning/20 border border-warning/20">
+        <div class="flex items-center gap-3">
+          <div class="flex items-center justify-center rounded-lg size-10 bg-warning/20 dark:bg-warning/30">
+            <app-icon name="pending" size="sm" class="text-amber-600 dark:text-amber-400"></app-icon>
+          </div>
+          <div>
+            <p class="text-xs text-text-muted-dark dark:text-text-muted-light">Pagamentos Pendentes</p>
+            <div class="flex items-center gap-2 mt-1">
+              <app-price-tag [price]="metrics.pendingPayments" size="md"></app-price-tag>
+              <span class="text-xs text-text-muted-dark dark:text-text-muted-light">
+                ({{ metrics.pendingPaymentsCount }})
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</app-card>
+

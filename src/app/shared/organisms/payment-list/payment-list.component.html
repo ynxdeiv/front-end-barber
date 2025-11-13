@@ -1,0 +1,29 @@
+@if (filteredPayments.length > 0) {
+  <div class="flex flex-col gap-3">
+    @for (payment of filteredPayments; track payment.id) {
+      <app-payment-row
+        [payment]="payment"
+        (markAsPaid)="onMarkAsPaid($event)"
+        (cancel)="onCancel($event)"
+        (viewDetails)="onViewDetails($event)">
+      </app-payment-row>
+    }
+  </div>
+} @else {
+  <app-card padding="lg">
+    <div class="flex flex-col items-center justify-center gap-4 py-8">
+      <div class="flex items-center justify-center rounded-full size-16 bg-primary/10 dark:bg-primary/20">
+        <app-icon name="payments" size="xl" class="text-text-muted-dark dark:text-text-muted-light"></app-icon>
+      </div>
+      <div class="text-center">
+        <p class="text-lg font-medium text-text-dark dark:text-text-light mb-1">
+          Nenhum pagamento encontrado
+        </p>
+        <p class="text-sm text-text-muted-dark dark:text-text-muted-light">
+          Não há pagamentos para exibir com os filtros selecionados.
+        </p>
+      </div>
+    </div>
+  </app-card>
+}
+

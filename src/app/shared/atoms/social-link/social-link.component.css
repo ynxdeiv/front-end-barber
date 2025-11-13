@@ -1,0 +1,16 @@
+.app-social-link {
+  @apply flex items-center justify-center rounded-full transition-all duration-200;
+}
+
+.app-social-link--sm {
+  @apply size-8;
+}
+
+.app-social-link--md {
+  @apply size-10;
+}
+
+.app-social-link--lg {
+  @apply size-12;
+}
+

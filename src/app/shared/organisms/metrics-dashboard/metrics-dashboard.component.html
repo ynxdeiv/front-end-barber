@@ -1,0 +1,101 @@
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+  <!-- Agendamentos Hoje -->
+  <app-metric-card
+    title="Agendamentos Hoje"
+    [value]="metrics.appointmentsToday"
+    icon="calendar_today"
+    color="info">
+  </app-metric-card>
+
+  <!-- Total de Agendamentos -->
+  <app-metric-card
+    title="Total Agendamentos"
+    [value]="metrics.totalAppointments"
+    icon="event"
+    color="primary">
+  </app-metric-card>
+
+  <!-- Receita Mensal -->
+  <app-metric-card
+    title="Receita Mensal"
+    [value]="metrics.monthlyRevenue"
+    icon="attach_money"
+    color="success"
+    [trend]="revenueTrend"
+    [trendValue]="revenueTrendValue"
+    trendLabel="vs mês anterior">
+  </app-metric-card>
+
+  <!-- Receita Hoje -->
+  <app-metric-card
+    title="Receita Hoje"
+    [value]="metrics.todayRevenue"
+    icon="today"
+    color="success">
+  </app-metric-card>
+
+  <!-- Próximos Agendamentos -->
+  <app-metric-card
+    title="Próximos Agendamentos"
+    [value]="metrics.upcomingAppointments"
+    icon="schedule"
+    color="warning">
+  </app-metric-card>
+
+  <!-- Taxa de Conclusão -->
+  <app-metric-card
+    title="Taxa de Conclusão"
+    [value]="metrics.appointmentCompletionRate"
+    icon="check_circle"
+    color="success">
+  </app-metric-card>
+
+  <!-- Ticket Médio -->
+  <app-metric-card
+    title="Ticket Médio"
+    [value]="metrics.averageTicket"
+    icon="receipt"
+    color="info">
+  </app-metric-card>
+
+  <!-- Pagamentos Pendentes -->
+  <app-metric-card
+    title="Pagamentos Pendentes"
+    [value]="metrics.pendingPaymentsCount"
+    icon="pending"
+    color="danger">
+  </app-metric-card>
+
+  <!-- Total de Clientes -->
+  <app-metric-card
+    title="Total de Clientes"
+    [value]="metrics.totalClients"
+    icon="people"
+    color="primary">
+  </app-metric-card>
+
+  <!-- Novos Clientes (Mês) -->
+  <app-metric-card
+    title="Novos Clientes (Mês)"
+    [value]="metrics.newClientsThisMonth"
+    icon="person_add"
+    color="success">
+  </app-metric-card>
+
+  <!-- Taxa de Retenção -->
+  <app-metric-card
+    title="Taxa de Retenção"
+    [value]="metrics.clientRetentionRate"
+    icon="loyalty"
+    color="info">
+  </app-metric-card>
+
+  <!-- Valor Pendente -->
+  <app-metric-card
+    title="Valor Pendente"
+    [value]="metrics.pendingPayments"
+    icon="account_balance_wallet"
+    color="warning">
+  </app-metric-card>
+</div>
+

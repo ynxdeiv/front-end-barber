@@ -1,0 +1,35 @@
+<app-card class="service-card" padding="md" [hover]="true">
+  <div class="flex flex-col gap-4">
+    <div class="flex items-start justify-between">
+      <div class="flex items-center gap-3">
+        <div class="flex items-center justify-center rounded-lg bg-primary/10 dark:bg-primary/20 size-12">
+          <app-icon [name]="categoryIcon" size="md" class="text-primary dark:text-primary-accent"></app-icon>
+        </div>
+        <div>
+          <h3 class="text-lg font-semibold text-text-dark dark:text-text-light">
+            {{ service.name }}
+          </h3>
+          <p class="text-xs text-text-muted-dark dark:text-text-muted-light">
+            {{ categoryLabel }} • {{ formatDuration() }}
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <p class="text-sm text-text-muted-dark dark:text-text-muted-light line-clamp-2">
+      {{ service.description }}
+    </p>
+
+    <div class="flex items-center justify-between pt-2 border-t border-border-light dark:border-border-dark">
+      <app-price-tag [price]="service.price" size="lg"></app-price-tag>
+      <app-button
+        type="button"
+        variant="secondary"
+        size="sm"
+        (click)="onBook()">
+        Agendar
+      </app-button>
+    </div>
+  </div>
+</app-card>
+

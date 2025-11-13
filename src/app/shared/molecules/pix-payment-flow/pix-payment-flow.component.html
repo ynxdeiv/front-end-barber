@@ -1,0 +1,111 @@
+<div class="flex flex-col gap-6">
+  <div class="text-center">
+    <h3 class="text-lg font-semibold text-text-dark dark:text-text-light mb-2">
+      Pagamento via PIX
+    </h3>
+    <p class="text-sm text-text-muted-dark dark:text-text-muted-light">
+      Escaneie o QR Code ou copie o código PIX
+    </p>
+  </div>
+
+  <!-- QR Code -->
+  <div class="flex justify-center">
+    <app-card padding="md" class="bg-white p-4">
+      @if (qrCode()) {
+        <img
+          [src]="qrCode()"
+          alt="QR Code PIX"
+          class="w-64 h-64 mx-auto">
+      } @else {
+        <div class="w-64 h-64 bg-gray-200 dark:bg-gray-700 flex items-center justify-center rounded-lg">
+          <app-icon name="hourglass_empty" size="xl" class="animate-spin text-text-muted-dark"></app-icon>
+        </div>
+      }
+    </app-card>
+  </div>
+
+  <!-- Timer -->
+  <div class="text-center">
+    <div class="mb-2">
+      <span class="text-sm text-text-muted-dark dark:text-text-muted-light">Tempo restante:</span>
+      <span class="text-lg font-bold text-text-dark dark:text-text-light ml-2">
+        {{ formatTime(timeRemaining()) }}
+      </span>
+    </div>
+    <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+      <div
+        class="bg-primary h-2 rounded-full transition-all duration-1000"
+        [style.width.%]="getTimePercentage()">
+      </div>
+    </div>
+  </div>
+
+  <!-- Código PIX -->
+  <app-card padding="md">
+    <div class="flex flex-col gap-3">
+      <label class="text-sm font-medium text-text-dark dark:text-text-light">
+        Código PIX (Copiar e Colar)
+      </label>
+      <div class="flex gap-2">
+        <input
+          type="text"
+          [value]="pixCode()"
+          readonly
+          class="flex-1 px-4 py-2 rounded-lg border border-border-light dark:border-border-dark bg-input-bg-light dark:bg-input-bg-dark text-text-dark dark:text-text-light text-xs font-mono">
+        <app-button
+          type="button"
+          variant="outline"
+          size="md"
+          (click)="copyPixCode()">
+          @if (isCopied()) {
+            <app-icon name="check" size="sm"></app-icon>
+          } @else {
+            <app-icon name="content_copy" size="sm"></app-icon>
+          }
+        </app-button>
+      </div>
+      @if (isCopied()) {
+        <p class="text-xs text-green-600 dark:text-green-400">
+          Código copiado!
+        </p>
+      }
+    </div>
+  </app-card>
+
+  <!-- Instruções -->
+  <div class="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
+    <div class="flex gap-3">
+      <app-icon name="info" size="md" class="text-blue-600 dark:text-blue-400 flex-shrink-0"></app-icon>
+      <div class="text-sm text-blue-800 dark:text-blue-300">
+        <p class="font-medium mb-1">Como pagar:</p>
+        <ol class="list-decimal list-inside space-y-1 text-xs">
+          <li>Abra o app do seu banco</li>
+          <li>Escaneie o QR Code ou cole o código PIX</li>
+          <li>Confirme o pagamento</li>
+          <li>Aguarde a confirmação automática</li>
+        </ol>
+      </div>
+    </div>
+  </div>
+
+  <!-- Status de Processamento -->
+  @if (isProcessing()) {
+    <div class="text-center py-4">
+      <div class="flex items-center justify-center gap-2 text-primary dark:text-primary-accent">
+        <app-icon name="hourglass_empty" size="md" class="animate-spin"></app-icon>
+        <span class="text-sm font-medium">Verificando pagamento...</span>
+      </div>
+    </div>
+  }
+
+  <!-- Botão Cancelar -->
+  <app-button
+    type="button"
+    variant="outline"
+    size="lg"
+    [fullWidth]="true"
+    (click)="onCancel()">
+    Cancelar Pagamento
+  </app-button>
+</div>
+

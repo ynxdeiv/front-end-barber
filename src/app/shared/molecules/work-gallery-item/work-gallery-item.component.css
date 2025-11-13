@@ -1,0 +1,4 @@
+.app-work-gallery-item {
+  @apply cursor-pointer;
+}
+
