@@ -11,7 +11,7 @@ export interface Appointment {
   userId?: string; // ID do usuário que fez o agendamento (referência ao data/users.ts)
   userName?: string; // Nome do usuário (para exibição rápida)
   userEmail?: string; // Email do usuário (para referência)
-  serviceId?: string; // ID do serviço selecionado
+  serviceId?: number; // ID do serviço selecionado
   serviceName?: string; // Nome do serviço (para exibição)
   servicePrice?: number; // Preço do serviço
   status: AppointmentStatus; // Status do agendamento

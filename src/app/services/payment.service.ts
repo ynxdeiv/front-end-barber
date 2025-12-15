@@ -60,7 +60,7 @@ export class PaymentService {
     const allPayments = this.getAllPayments();
     const start = startDate.getTime();
     const end = endDate.getTime();
-    
+
     return allPayments.filter(payment => {
       const paymentDate = new Date(payment.createdAt).getTime();
       return paymentDate >= start && paymentDate <= end;
@@ -70,42 +70,47 @@ export class PaymentService {
   /**
    * Cria um novo pagamento
    */
-  createPayment(
+  async createPayment(
     barbeiroId: number,
     amount: number,
     serviceDescription: string,
     appointmentId?: string,
     notes?: string
-  ): Pagamento | null {
-    const barbeiro = this.barberService.getBarbeiroById(barbeiroId);
-    if (!barbeiro) {
-      console.error('Barbeiro não encontrado:', barbeiroId);
+  ): Promise<Pagamento | null> {
+    try {
+      const barbeiro = await this.barberService.getBarbeiroById(barbeiroId);
+      if (!barbeiro) {
+        console.error('Barbeiro não encontrado:', barbeiroId);
+        return null;
+      }
+
+      const commission = (amount * barbeiro.commissionPercentage) / 100;
+      const dueDate = new Date();
+      dueDate.setDate(dueDate.getDate() + 7); // Vencimento em 7 dias
+
+      const payment: Pagamento = {
+        id: this.generateId(),
+        barbeiroId,
+        barbeiroName: barbeiro.name,
+        appointmentId,
+        amount,
+        commission,
+        serviceDescription,
+        status: 'pending',
+        dueDate: dueDate.toISOString(),
+        createdAt: new Date().toISOString(),
+        notes
+      };
+
+      const allPayments = this.getAllPayments();
+      allPayments.push(payment);
+      localStorage.setItem(this.STORAGE_KEY, JSON.stringify(allPayments));
+
+      return payment;
+    } catch (error) {
+      console.error('Error creating payment:', error);
       return null;
     }
-
-    const commission = (amount * barbeiro.commissionPercentage) / 100;
-    const dueDate = new Date();
-    dueDate.setDate(dueDate.getDate() + 7); // Vencimento em 7 dias
-
-    const payment: Pagamento = {
-      id: this.generateId(),
-      barbeiroId,
-      barbeiroName: barbeiro.name,
-      appointmentId,
-      amount,
-      commission,
-      serviceDescription,
-      status: 'pending',
-      dueDate: dueDate.toISOString(),
-      createdAt: new Date().toISOString(),
-      notes
-    };
-
-    const allPayments = this.getAllPayments();
-    allPayments.push(payment);
-    localStorage.setItem(this.STORAGE_KEY, JSON.stringify(allPayments));
-
-    return payment;
   }
 
   /**
@@ -114,7 +119,7 @@ export class PaymentService {
   markAsPaid(paymentId: string, paymentDate?: Date): boolean {
     const allPayments = this.getAllPayments();
     const index = allPayments.findIndex(p => p.id === paymentId);
-    
+
     if (index === -1) {
       return false;
     }
@@ -135,7 +140,7 @@ export class PaymentService {
   cancelPayment(paymentId: string): boolean {
     const allPayments = this.getAllPayments();
     const index = allPayments.findIndex(p => p.id === paymentId);
-    
+
     if (index === -1) {
       return false;
     }
@@ -155,7 +160,7 @@ export class PaymentService {
   updatePayment(paymentId: string, updates: Partial<Pagamento>): boolean {
     const allPayments = this.getAllPayments();
     const index = allPayments.findIndex(p => p.id === paymentId);
-    
+
     if (index === -1) {
       return false;
     }
@@ -171,7 +176,7 @@ export class PaymentService {
   deletePayment(paymentId: string): boolean {
     const allPayments = this.getAllPayments();
     const filtered = allPayments.filter(p => p.id !== paymentId);
-    
+
     if (filtered.length === allPayments.length) {
       return false; // Não encontrado
     }
@@ -207,15 +212,15 @@ export class PaymentService {
   /**
    * Processa pagamento para um agendamento existente
    */
-  processAppointmentPayment(
+  async processAppointmentPayment(
     appointmentId: string,
     appointmentServiceName: string,
     appointmentServicePrice: number,
     paymentMethod: 'credit_card' | 'debit_card' | 'pix' | 'cash',
     barbeiroId?: number
-  ): { success: boolean; paymentId?: string; message: string } {
+  ): Promise<{ success: boolean; paymentId?: string; message: string }> {
     // Criar pagamento associado ao agendamento
-    const payment = this.createPayment(
+    const payment = await this.createPayment(
       barbeiroId || 1, // Usar barbeiro padrão se não especificado
       appointmentServicePrice,
       `Pagamento: ${appointmentServiceName}`,

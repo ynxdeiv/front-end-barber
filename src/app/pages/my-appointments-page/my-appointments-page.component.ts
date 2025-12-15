@@ -42,19 +42,19 @@ export class MyAppointmentsPageComponent implements OnInit {
   appointments = signal<Appointment[]>([]);
   filteredAppointments = signal<Appointment[]>([]);
   selectedAppointment = signal<Appointment | null>(null);
-  
+
   // Estados para remarcação
   showRescheduleModal = signal(false);
   rescheduleDate = signal<Date | null>(null);
   rescheduleTime = signal<string | null>(null);
   rescheduleService = signal<Service | null>(null);
   refreshTrigger = signal(0);
-  
+
   // Estados para pagamento
   showPaymentModal = signal(false);
   appointmentToPay = signal<Appointment | null>(null);
   serviceToPay = signal<Service | null>(null);
-  
+
   // Filtros
   filterStatus = signal<AppointmentStatus | 'all'>('all');
   services = DEFAULT_SERVICES;
@@ -82,7 +82,7 @@ export class MyAppointmentsPageComponent implements OnInit {
   applyFilters(): void {
     const status = this.filterStatus();
     const all = this.appointments();
-    
+
     if (status === 'all') {
       this.filteredAppointments.set(all);
     } else {
@@ -142,7 +142,7 @@ export class MyAppointmentsPageComponent implements OnInit {
     if (appointment.status === 'pending_payment') {
       return true;
     }
-    
+
     // Para agendamentos confirmados, só pode cancelar se for pelo menos 2 horas antes
     if (appointment.status === 'confirmed') {
       const appointmentDate = new Date(appointment.date + 'T' + appointment.startTime);
@@ -150,7 +150,7 @@ export class MyAppointmentsPageComponent implements OnInit {
       const hoursUntilAppointment = (appointmentDate.getTime() - now.getTime()) / (1000 * 60 * 60);
       return hoursUntilAppointment >= 2;
     }
-    
+
     return false;
   }
 
@@ -158,9 +158,9 @@ export class MyAppointmentsPageComponent implements OnInit {
     const appointmentDate = new Date(appointment.date + 'T' + appointment.startTime);
     const now = new Date();
     const hoursUntilAppointment = (appointmentDate.getTime() - now.getTime()) / (1000 * 60 * 60);
-    
+
     // Só pode remarcar se for pelo menos 2 horas antes do agendamento
-    return hoursUntilAppointment >= 2 && 
+    return hoursUntilAppointment >= 2 &&
            (appointment.status === 'confirmed' || appointment.status === 'pending_payment');
   }
 
@@ -256,13 +256,13 @@ export class MyAppointmentsPageComponent implements OnInit {
     this.showPaymentModal.set(true);
   }
 
-  onPaymentProcessed(data: { appointmentId: string; paymentMethod: PaymentMethod; paymentResult: PaymentResult }): void {
+  async onPaymentProcessed(data: { appointmentId: string; paymentMethod: PaymentMethod; paymentResult: PaymentResult }): Promise<void> {
     const appointment = this.appointmentToPay();
     if (!appointment) return;
 
     if (data.paymentResult.success) {
       // Processar pagamento no serviço
-      this.paymentService.processAppointmentPayment(
+      await this.paymentService.processAppointmentPayment(
         appointment.id,
         appointment.serviceName || 'Serviço',
         appointment.servicePrice || 0,
@@ -278,7 +278,7 @@ export class MyAppointmentsPageComponent implements OnInit {
       this.appointmentToPay.set(null);
       this.serviceToPay.set(null);
       this.loadAppointments();
-      
+
       alert('Pagamento processado com sucesso! Agendamento confirmado.');
     } else {
       alert(`Falha no pagamento: ${data.paymentResult.message}`);

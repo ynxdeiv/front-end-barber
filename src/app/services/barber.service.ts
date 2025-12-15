@@ -1,109 +1,92 @@
 import { Injectable } from '@angular/core';
 import { Barbeiro } from '../models/barbeiro';
-import { BARBEIROS } from '../data/barbeiros';
+import { apiClient } from '../config/api.config';
+import { handleApiError } from '../utils/api-error.util';
+
+export interface BarberRequest {
+  name: string;
+  email: string;
+  phone: string;
+  specialty: string;
+  active: boolean;
+  commissionPercentage: number;
+}
 
 @Injectable({
   providedIn: 'root'
 })
 export class BarberService {
-  private readonly STORAGE_KEY = 'barber_barbeiros';
-  private barbeiros: Barbeiro[] = [];
+  private readonly API_PATH = '/barbers';
 
-  constructor() {
-    this.initializeBarbeiros();
-  }
-
-  /**
-   * Inicializa barbeiros do localStorage ou usa dados mockados
-   */
-  private initializeBarbeiros(): void {
-    const stored = localStorage.getItem(this.STORAGE_KEY);
-    if (stored) {
-      try {
-        this.barbeiros = JSON.parse(stored);
-      } catch {
-        this.barbeiros = [...BARBEIROS];
-        this.saveToStorage();
-      }
-    } else {
-      this.barbeiros = [...BARBEIROS];
-      this.saveToStorage();
-    }
-  }
-
-  /**
-   * Salva barbeiros no localStorage
-   */
-  private saveToStorage(): void {
-    localStorage.setItem(this.STORAGE_KEY, JSON.stringify(this.barbeiros));
-  }
+  constructor() {}
 
   /**
    * Obtém todos os barbeiros
+   * @param active - Filtrar por status ativo (opcional)
    */
-  getAllBarbeiros(): Barbeiro[] {
-    return [...this.barbeiros];
+  async getAllBarbeiros(active?: boolean): Promise<Barbeiro[]> {
+    try {
+      const params = active !== undefined ? { active: active.toString() } : {};
+      const response = await apiClient.get<Barbeiro[]>(this.API_PATH, { params });
+      return response.data;
+    } catch (error) {
+      throw handleApiError(error);
+    }
   }
 
   /**
    * Obtém apenas barbeiros ativos
    */
-  getActiveBarbeiros(): Barbeiro[] {
-    return this.barbeiros.filter(b => b.active);
+  async getActiveBarbeiros(): Promise<Barbeiro[]> {
+    return this.getAllBarbeiros(true);
   }
 
   /**
    * Busca barbeiro por ID
    */
-  getBarbeiroById(id: number): Barbeiro | undefined {
-    return this.barbeiros.find(b => b.id === id);
-  }
-
-  /**
-   * Cria um novo barbeiro
-   */
-  createBarbeiro(barbeiro: Omit<Barbeiro, 'id' | 'createdAt'>): Barbeiro {
-    const newId = this.generateId();
-    const newBarbeiro: Barbeiro = {
-      ...barbeiro,
-      id: newId,
-      createdAt: new Date().toISOString()
-    };
-    
-    this.barbeiros.push(newBarbeiro);
-    this.saveToStorage();
-    return newBarbeiro;
-  }
-
-  /**
-   * Atualiza um barbeiro existente
-   */
-  updateBarbeiro(id: number, updates: Partial<Barbeiro>): boolean {
-    const index = this.barbeiros.findIndex(b => b.id === id);
-    if (index === -1) {
-      return false;
+  async getBarbeiroById(id: number): Promise<Barbeiro> {
+    try {
+      const response = await apiClient.get<Barbeiro>(`${this.API_PATH}/${id}`);
+      return response.data;
+    } catch (error) {
+      throw handleApiError(error);
     }
-    
-    this.barbeiros[index] = { ...this.barbeiros[index], ...updates };
-    this.saveToStorage();
-    return true;
   }
 
   /**
-   * Remove um barbeiro (soft delete - marca como inativo)
+   * Cria um novo barbeiro (requer autenticação de admin)
    */
-  deleteBarbeiro(id: number): boolean {
-    return this.updateBarbeiro(id, { active: false });
+  async createBarbeiro(barberData: BarberRequest): Promise<Barbeiro> {
+    try {
+      const response = await apiClient.post<Barbeiro>(this.API_PATH, barberData);
+      return response.data;
+    } catch (error) {
+      throw handleApiError(error);
+    }
   }
 
   /**
-   * Gera um ID único para novo barbeiro
+   * Atualiza um barbeiro existente (requer autenticação de admin)
    */
-  private generateId(): number {
-    const maxId = this.barbeiros.length > 0 
-      ? Math.max(...this.barbeiros.map(b => b.id))
-      : 0;
-    return maxId + 1;
+  async updateBarbeiro(id: number, updates: BarberRequest): Promise<Barbeiro> {
+    try {
+      const response = await apiClient.put<Barbeiro>(`${this.API_PATH}/${id}`, updates);
+      return response.data;
+    } catch (error) {
+      throw handleApiError(error);
+    }
+  }
+
+  /**
+   * Remove um barbeiro (soft delete - marca como inativo) (requer autenticação de admin)
+   */
+  async deleteBarbeiro(id: number): Promise<{ success: boolean; message: string }> {
+    try {
+      const response = await apiClient.delete<{ success: boolean; message: string }>(`${this.API_PATH}/${id}`);
+      return response.data;
+    } catch (error) {
+      throw handleApiError(error);
+    }
   }
 }
 

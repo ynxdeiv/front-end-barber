@@ -121,12 +121,12 @@ export class AppointmentPageComponent {
   }
 
   // Processar Pagamento
-  onPaymentProcessed(data: { appointmentId: string; paymentMethod: PaymentMethod; paymentResult: any }): void {
+  async onPaymentProcessed(data: { appointmentId: string; paymentMethod: PaymentMethod; paymentResult: any }): Promise<void> {
     const appointment = this.createdAppointment();
     if (!appointment) return;
 
     // Processar pagamento
-    const paymentResult = this.paymentService.processAppointmentPayment(
+    const paymentResult = await this.paymentService.processAppointmentPayment(
       appointment.id,
       appointment.serviceName || '',
       appointment.servicePrice || 0,

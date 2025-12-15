@@ -12,14 +12,14 @@ import { ServiceOptionCardComponent } from '../../atoms/service-option-card/serv
 })
 export class ServiceSelectionStepComponent {
   @Input() services: Service[] = [];
-  @Input() selectedServiceId?: string;
+  @Input() selectedServiceId?: number;
   @Output() serviceSelected = new EventEmitter<Service>();
 
   onServiceSelect(service: Service): void {
     this.serviceSelected.emit(service);
   }
 
-  isSelected(serviceId: string): boolean {
+  isSelected(serviceId: number): boolean {
     return this.selectedServiceId === serviceId;
   }
 }

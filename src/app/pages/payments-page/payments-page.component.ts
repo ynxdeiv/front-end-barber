@@ -57,9 +57,15 @@ export class PaymentsPageComponent implements OnInit {
     this.loadData();
   }
 
-  loadData(): void {
+  async loadData(): Promise<void> {
     this.payments.set(this.paymentService.getAllPayments());
-    this.barbeiros.set(this.barberService.getActiveBarbeiros());
+    try {
+      const barbers = await this.barberService.getActiveBarbeiros();
+      this.barbeiros.set(barbers);
+    } catch (error) {
+      console.error('Error loading barbers:', error);
+      this.barbeiros.set([]);
+    }
     this.applyFilters();
   }
 
@@ -92,8 +98,17 @@ export class PaymentsPageComponent implements OnInit {
     amount: number;
     serviceDescription: string;
     notes?: string;
-  }): void {
-    const payment = this.paymentService.createPayment(
+  }): Promise<void> {
+    return this.handlePaymentCreation(data);
+  }
+
+  private async handlePaymentCreation(data: {
+    barbeiroId: number;
+    amount: number;
+    serviceDescription: string;
+    notes?: string;
+  }): Promise<void> {
+    const payment = await this.paymentService.createPayment(
       data.barbeiroId,
       data.amount,
       data.serviceDescription,

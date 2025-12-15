@@ -2,7 +2,7 @@ import { Service } from '../models/service';
 
 export const DEFAULT_SERVICES: Service[] = [
   {
-    id: 'svc_1',
+    id: 1,
     name: 'Corte Social',
     description: 'Corte moderno e estiloso com técnicas profissionais',
     price: 35.00,
@@ -12,7 +12,7 @@ export const DEFAULT_SERVICES: Service[] = [
     imageUrl: 'https://images.unsplash.com/photo-1503951914875-452162b0f3f1?w=400'
   },
   {
-    id: 'svc_2',
+    id: 2,
     name: 'Barba',
     description: 'Aparar, modelar e finalizar sua barba com estilo',
     price: 25.00,
@@ -22,7 +22,7 @@ export const DEFAULT_SERVICES: Service[] = [
     imageUrl: 'https://images.unsplash.com/photo-1560250097-0b93528c311a?w=400'
   },
   {
-    id: 'svc_3',
+    id: 3,
     name: 'Combo',
     description: 'Pacote completo: corte e barba com desconto especial',
     price: 50.00,
@@ -32,7 +32,7 @@ export const DEFAULT_SERVICES: Service[] = [
     imageUrl: 'https://images.unsplash.com/photo-1621605815971-fbc98d665033?w=400'
   },
   {
-    id: 'svc_4',
+    id: 4,
     name: 'Sobrancelha',
     description: 'Design e modelagem de sobrancelhas',
     price: 15.00,

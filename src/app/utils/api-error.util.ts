@@ -107,3 +107,12 @@ export function logError(error: any, context?: string): void {
   });
 }
 
+/**
+ * Handles API errors and throws a structured error
+ */
+export function handleApiError(error: any): never {
+  const apiError = createApiError(error);
+  logError(error);
+  throw apiError;
+}
+
