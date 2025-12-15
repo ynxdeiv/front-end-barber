@@ -8,7 +8,6 @@ import { AuthService } from '../../services/auth.service';
 import { MetricsCalculationService, DashboardMetrics } from '../../services/metrics-calculation.service';
 import { Appointment } from '../../models/appointment';
 import { IconComponent } from '../../shared/atoms/icon/icon.component';
-import { CardComponent } from '../../shared/atoms/card/card.component';
 
 @Component({
   selector: 'app-admin-dashboard-page',
@@ -19,8 +18,7 @@ import { CardComponent } from '../../shared/atoms/card/card.component';
     MetricsDashboardComponent,
     TodayAppointmentsListComponent,
     FinancialSummaryComponent,
-    IconComponent,
-    CardComponent
+    IconComponent
   ],
   templateUrl: './admin-dashboard-page.component.html',
   styleUrl: './admin-dashboard-page.component.css'
@@ -41,12 +39,12 @@ export class AdminDashboardPageComponent implements OnInit {
 
   loadDashboardData(): void {
     this.isLoading.set(true);
-    
+
     // Simular um pequeno delay para melhor UX
     setTimeout(() => {
       const metrics = this.metricsService.calculateMetrics();
       const todayAppointments = this.metricsService.getTodayAppointments();
-      
+
       this.metrics.set(metrics);
       this.todayAppointments.set(todayAppointments);
       this.isLoading.set(false);

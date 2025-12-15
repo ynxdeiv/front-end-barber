@@ -26,7 +26,7 @@ export class LoginPageComponent {
   showPassword = false;
   loginImageUrl = 'https://nucleocursos.com.br/blog/wp-content/uploads/2024/03/Curso-de-barbearia-profissional.jpg';
   loginImageAlt = 'Curso de barbearia profissional - ambiente de barbearia moderna e equipada.';
-  
+
   showErrorMessage = signal(false);
   errorMessage = signal('');
 
@@ -39,19 +39,24 @@ export class LoginPageComponent {
     this.showPassword = !this.showPassword;
   }
 
-  onLoginSubmit(data: { email: string; password: string }) {
-    const result = this.authService.login(data.email, data.password);
+  async onLoginSubmit(data: { email: string; password: string }) {
+    try {
+      const result = await this.authService.login(data.email, data.password);
 
-    if (result.success && result.user) {
-      // Redirecionar baseado no tipo de usuário detectado automaticamente
-      if (result.user.type === 'admin') {
-        this.router.navigate(['/admin']);
+      if (result.success && result.user) {
+        // Redirecionar baseado no tipo de usuário detectado automaticamente
+        if (result.user.type === 'admin') {
+          this.router.navigate(['/admin']);
+        } else {
+          this.router.navigate(['/appointment']);
+        }
       } else {
-        this.router.navigate(['/appointment']);
+        this.showErrorMessage.set(true);
+        this.errorMessage.set(result.message);
       }
-    } else {
+    } catch (error) {
       this.showErrorMessage.set(true);
-      this.errorMessage.set(result.message);
+      this.errorMessage.set('Erro ao fazer login. Tente novamente.');
     }
   }
 }

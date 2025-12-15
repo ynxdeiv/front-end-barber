@@ -94,7 +94,7 @@ export class AppointmentPageComponent {
   }
 
   // Step 4: Confirmar Agendamento
-  onConfirmAppointment(): void {
+  async onConfirmAppointment(): Promise<void> {
     if (!this.selectedDate() || !this.selectedTime() || !this.selectedService()) {
       this.showErrorMessage.set(true);
       this.message.set('Por favor, complete todas as etapas.');
@@ -102,7 +102,7 @@ export class AppointmentPageComponent {
     }
 
     const user = this.authService.getCurrentUser();
-    const appointment = this.appointmentService.createAppointmentWithService(
+    const appointment = await this.appointmentService.createAppointmentWithService(
       this.selectedDate()!,
       this.selectedTime()!,
       this.selectedService()!,

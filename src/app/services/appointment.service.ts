@@ -60,7 +60,7 @@ export class AppointmentService {
    */
   isTimeSlotAvailable(date: Date, startTime: string, endTime: string): boolean {
     const appointments = this.getAppointmentsByDate(date);
-    
+
     if (appointments.length === 0) {
       return true;
     }
@@ -95,22 +95,22 @@ export class AppointmentService {
   /**
    * Cria um novo agendamento (método legado - mantido para compatibilidade)
    */
-  createAppointment(date: Date, time: string, userId?: string): Appointment | null {
+  async createAppointment(date: Date, time: string, userId?: string): Promise<Appointment | null> {
     return this.createAppointmentWithService(date, time, undefined, userId);
   }
 
   /**
    * Cria um novo agendamento com serviço selecionado
    */
-  createAppointmentWithService(
+  async createAppointmentWithService(
     date: Date,
     time: string,
     service?: Service,
     userId?: string
-  ): Appointment | null {
+  ): Promise<Appointment | null> {
     // Extrair startTime e endTime do formato "HH:MM - HH:MM"
     const [startTime, endTime] = time.split(' - ').map(t => t.trim());
-    
+
     if (!startTime || !endTime) {
       console.error('Formato de horário inválido:', time);
       return null;
@@ -124,9 +124,10 @@ export class AppointmentService {
     // Buscar informações do usuário se userId foi fornecido
     let userName: string | undefined;
     let userEmail: string | undefined;
-    
+
     if (userId) {
-      const user = this.authService.getAllUsersForAppointments().find(u => u.id.toString() === userId);
+      const users = await this.authService.getAllUsersForAppointments();
+      const user = users.find(u => u.id.toString() === userId);
       if (user) {
         userName = user.name;
         userEmail = user.email;
@@ -162,7 +163,7 @@ export class AppointmentService {
   confirmAppointment(appointmentId: string, paymentId?: string): boolean {
     const allAppointments = this.getAllAppointments();
     const appointment = allAppointments.find(apt => apt.id === appointmentId);
-    
+
     if (!appointment) {
       return false;
     }
@@ -183,7 +184,7 @@ export class AppointmentService {
   updateAppointmentStatus(appointmentId: string, status: AppointmentStatus): boolean {
     const allAppointments = this.getAllAppointments();
     const appointment = allAppointments.find(apt => apt.id === appointmentId);
-    
+
     if (!appointment) {
       return false;
     }
@@ -211,7 +212,7 @@ export class AppointmentService {
   deleteAppointment(id: string): boolean {
     const allAppointments = this.getAllAppointments();
     const filtered = allAppointments.filter(apt => apt.id !== id);
-    
+
     if (filtered.length === allAppointments.length) {
       return false; // Não encontrado
     }
@@ -233,7 +234,7 @@ export class AppointmentService {
   rescheduleAppointment(id: string, newDate: Date, newTime: string, newStartTime: string, newEndTime: string): boolean {
     const allAppointments = this.getAllAppointments();
     const appointment = allAppointments.find(apt => apt.id === id);
-    
+
     if (!appointment) {
       return false;
     }

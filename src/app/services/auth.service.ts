@@ -1,14 +1,25 @@
 import { Injectable, signal, computed } from '@angular/core';
 import { Router } from '@angular/router';
-import { User, UserType, AdminUser, SchedulerUser } from '../models/user';
-import { DEFAULT_ADMIN, DEFAULT_SCHEDULER } from '../data/users';
+import {
+  User,
+  UserType,
+  AdminUser,
+  SchedulerUser,
+  RegisterAdminRequest,
+  RegisterSchedulerRequest,
+  LoginRequest,
+  AuthResponse,
+  UserResponse
+} from '../models/user';
+import { apiClient } from '../config/api.config';
+import { getErrorMessage, logError } from '../utils/api-error.util';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
   private readonly STORAGE_KEY = 'barber_auth';
-  private readonly USERS_KEY = 'barber_users';
+  private readonly TOKEN_KEY = 'barber_auth_token';
 
   // Estado reativo
   private currentUser = signal<User | null>(null);
@@ -24,34 +35,66 @@ export class AuthService {
   isScheduler = computed(() => this.userType() === 'scheduler');
 
   constructor(private router: Router) {
-    this.initializeDefaultUsers();
     this.loadStoredSession();
+    this.initializeUserFromToken();
   }
 
   /**
-   * Inicializa usuários padrão se não existirem
+   * Initialize user from stored token by calling /api/auth/me
    */
-  private initializeDefaultUsers(): void {
-    const users = this.getAllUsers();
-    
-    // Adicionar admin padrão se não existir
-    if (!users.some(u => u.email === DEFAULT_ADMIN.email)) {
-      users.push(DEFAULT_ADMIN);
+  private async initializeUserFromToken(): Promise<void> {
+    const token = localStorage.getItem(this.TOKEN_KEY);
+    if (token && !this.currentUser()) {
+      try {
+        await this.getCurrentUserProfile();
+      } catch (error) {
+        console.error('Failed to load user profile:', error);
+        this.clearSession();
+      }
     }
-    
-    // Adicionar cliente padrão se não existir
-    if (!users.some(u => u.email === DEFAULT_SCHEDULER.email)) {
-      users.push(DEFAULT_SCHEDULER);
-    }
-    
-    this.saveUsers(users);
   }
 
   /**
-   * Obtém todos os usuários do sistema (para uso em agendamentos)
+   * Get all users from backend API (for use in appointments)
    */
-  getAllUsersForAppointments(): User[] {
-    return this.getAllUsers();
+  async getAllUsersForAppointments(): Promise<User[]> {
+    try {
+      const response = await apiClient.get<UserResponse[]>('/users');
+      return response.data.map(this.mapUserResponseToUser);
+    } catch (error) {
+      console.error('Error fetching users:', error);
+      return [];
+    }
+  }
+
+  /**
+   * Map UserResponse to User type
+   */
+  private mapUserResponseToUser(userResponse: UserResponse): User {
+    if (userResponse.type === 'admin') {
+      return {
+        id: userResponse.id,
+        email: userResponse.email,
+        name: userResponse.name,
+        phone: userResponse.phone,
+        type: 'admin',
+        barbershopName: userResponse.barbershopName || '',
+        address: userResponse.address || '',
+        createdAt: userResponse.createdAt,
+        services: [],
+        businessHours: this.getDefaultBusinessHours()
+      } as AdminUser;
+    } else {
+      return {
+        id: userResponse.id,
+        email: userResponse.email,
+        name: userResponse.name,
+        phone: userResponse.phone,
+        type: 'scheduler',
+        createdAt: userResponse.createdAt,
+        preferences: {}
+      } as SchedulerUser;
+    }
   }
 
   /**
@@ -71,19 +114,21 @@ export class AuthService {
   }
 
   /**
-   * Salva sessão no localStorage
+   * Save session with token and user data
    */
-  private saveSession(user: User): void {
+  private saveSession(user: User, token: string): void {
     localStorage.setItem(this.STORAGE_KEY, JSON.stringify(user));
+    localStorage.setItem(this.TOKEN_KEY, token);
     this.currentUser.set(user);
     this.isAuthenticated.set(true);
   }
 
   /**
-   * Limpa sessão
+   * Clear session
    */
   clearSession(): void {
     localStorage.removeItem(this.STORAGE_KEY);
+    localStorage.removeItem(this.TOKEN_KEY);
     this.currentUser.set(null);
     this.isAuthenticated.set(false);
   }
@@ -103,138 +148,172 @@ export class AuthService {
   }
 
   /**
-   * Login - detecta automaticamente o tipo de usuário pelo email
+   * Login with backend API
    */
-  login(email: string, password: string): { success: boolean; message: string; user?: User } {
-    const users = this.getAllUsers();
-    const user = users.find(
-      u => u.email === email && u.password === password
-    );
-
-    if (!user) {
-      return {
-        success: false,
-        message: 'E-mail ou senha incorretos.'
-      };
-    }
-
-    this.saveSession(user);
-    return {
-      success: true,
-      message: `Bem-vindo, ${user.name}!`,
-      user
-    };
-  }
-
-  /**
-   * Registro de Admin
-   */
-  registerAdmin(userData: Omit<AdminUser, 'id' | 'createdAt' | 'type'>): { success: boolean; message: string; user?: AdminUser } {
-    const users = this.getAllUsers();
-    
-    // Verificar se email já existe
-    if (users.some(u => u.email === userData.email)) {
-      return {
-        success: false,
-        message: 'Este e-mail já está cadastrado.'
-      };
-    }
-
-    const newId = this.generateUserId();
-    const adminUser: AdminUser = {
-      ...userData,
-      id: newId,
-      type: 'admin',
-      createdAt: new Date().toISOString(),
-      services: userData.services || [],
-      businessHours: userData.businessHours || this.getDefaultBusinessHours()
-    };
-
-    users.push(adminUser);
-    this.saveUsers(users);
-
-    this.saveSession(adminUser);
-    return {
-      success: true,
-      message: 'Conta de administrador criada com sucesso!',
-      user: adminUser
-    };
-  }
-
-  /**
-   * Registro de Scheduler (Cliente)
-   */
-  registerScheduler(userData: Omit<SchedulerUser, 'id' | 'createdAt' | 'type' | 'preferences'>): { success: boolean; message: string; user?: SchedulerUser } {
-    const users = this.getAllUsers();
-    
-    // Verificar se email já existe
-    if (users.some(u => u.email === userData.email)) {
-      return {
-        success: false,
-        message: 'Este e-mail já está cadastrado.'
-      };
-    }
-
-    const newId = this.generateUserId();
-    const schedulerUser: SchedulerUser = {
-      ...userData,
-      id: newId,
-      type: 'scheduler',
-      createdAt: new Date().toISOString(),
-      preferences: {}
-    };
-
-    users.push(schedulerUser);
-    this.saveUsers(users);
-
-    this.saveSession(schedulerUser);
-    return {
-      success: true,
-      message: 'Conta criada com sucesso!',
-      user: schedulerUser
-    };
-  }
-
-  /**
-   * Logout
-   */
-  logout(): void {
-    this.clearSession();
-    this.router.navigate(['/']);
-  }
-
-  /**
-   * Obtém todos os usuários
-   */
-  private getAllUsers(): User[] {
-    const stored = localStorage.getItem(this.USERS_KEY);
-    if (!stored) {
-      return [];
-    }
+  async login(email: string, password: string): Promise<{ success: boolean; message: string; user?: User }> {
     try {
-      return JSON.parse(stored);
-    } catch {
-      return [];
+      const loginRequest: LoginRequest = { email, password };
+      const response = await apiClient.post<AuthResponse>('/auth/login', loginRequest);
+
+      if (response.data.success && response.data.token && response.data.user) {
+        const user = this.mapUserResponseToUser(response.data.user as UserResponse);
+        this.saveSession(user, response.data.token);
+
+        return {
+          success: true,
+          message: response.data.message,
+          user
+        };
+      }
+
+      return {
+        success: false,
+        message: response.data.message || 'Login failed'
+      };
+    } catch (error: any) {
+      console.error('Login error:', error);
+      const message = error.response?.data?.message || 'E-mail ou senha incorretos.';
+      return {
+        success: false,
+        message
+      };
     }
   }
 
   /**
-   * Salva usuários
+   * Register Admin with backend API
    */
-  private saveUsers(users: User[]): void {
-    localStorage.setItem(this.USERS_KEY, JSON.stringify(users));
+  async registerAdmin(userData: Omit<AdminUser, 'id' | 'createdAt' | 'type' | 'services' | 'businessHours'>): Promise<{ success: boolean; message: string; user?: AdminUser }> {
+    try {
+      const registerRequest: RegisterAdminRequest = {
+        email: userData.email,
+        password: userData.password || '',
+        name: userData.name,
+        phone: userData.phone,
+        barbershopName: userData.barbershopName,
+        address: userData.address
+      };
+
+      const response = await apiClient.post<AuthResponse>('/auth/register/admin', registerRequest);
+
+      if (response.data.success && response.data.user) {
+        const adminUser = this.mapUserResponseToUser(response.data.user as UserResponse) as AdminUser;
+
+        // If token is provided, save session (auto-login after registration)
+        if (response.data.token) {
+          this.saveSession(adminUser, response.data.token);
+        }
+
+        return {
+          success: true,
+          message: response.data.message,
+          user: adminUser
+        };
+      }
+
+      return {
+        success: false,
+        message: response.data.message || 'Registration failed'
+      };
+    } catch (error: any) {
+      console.error('Admin registration error:', error);
+      const message = error.response?.data?.message || 'Erro ao criar conta de administrador.';
+      return {
+        success: false,
+        message
+      };
+    }
   }
 
   /**
-   * Gera ID único para usuário
+   * Register Scheduler with backend API
    */
-  private generateUserId(): number {
-    const users = this.getAllUsers();
-    const maxId = users.length > 0 
-      ? Math.max(...users.map(u => u.id))
-      : 0;
-    return maxId + 1;
+  async registerScheduler(userData: Omit<SchedulerUser, 'id' | 'createdAt' | 'type' | 'preferences'>): Promise<{ success: boolean; message: string; user?: SchedulerUser }> {
+    try {
+      const registerRequest: RegisterSchedulerRequest = {
+        email: userData.email,
+        password: userData.password || '',
+        name: userData.name,
+        phone: userData.phone
+      };
+
+      const response = await apiClient.post<AuthResponse>('/auth/register/scheduler', registerRequest);
+
+      if (response.data.success && response.data.user) {
+        const schedulerUser = this.mapUserResponseToUser(response.data.user as UserResponse) as SchedulerUser;
+
+        // If token is provided, save session (auto-login after registration)
+        if (response.data.token) {
+          this.saveSession(schedulerUser, response.data.token);
+        }
+
+        return {
+          success: true,
+          message: response.data.message,
+          user: schedulerUser
+        };
+      }
+
+      return {
+        success: false,
+        message: response.data.message || 'Registration failed'
+      };
+    } catch (error: any) {
+      console.error('Scheduler registration error:', error);
+      const message = error.response?.data?.message || 'Erro ao criar conta.';
+      return {
+        success: false,
+        message
+      };
+    }
   }
+
+  /**
+   * Logout with backend API
+   */
+  async logout(): Promise<void> {
+    try {
+      // Call backend logout endpoint
+      await apiClient.post('/auth/logout');
+    } catch (error) {
+      console.error('Logout error:', error);
+    } finally {
+      // Always clear local session regardless of API call result
+      this.clearSession();
+      this.router.navigate(['/']);
+    }
+  }
+
+  /**
+   * Get current user profile from backend API
+   */
+  async getCurrentUserProfile(): Promise<User | null> {
+    try {
+      const response = await apiClient.get<UserResponse>('/auth/me');
+      const user = this.mapUserResponseToUser(response.data);
+      this.currentUser.set(user);
+      this.isAuthenticated.set(true);
+      return user;
+    } catch (error) {
+      console.error('Error fetching current user:', error);
+      this.clearSession();
+      return null;
+    }
+  }
+
+  /**
+   * Get all users (requires authentication)
+   */
+  async getAllUsers(): Promise<User[]> {
+    try {
+      const response = await apiClient.get<UserResponse[]>('/users');
+      return response.data.map(this.mapUserResponseToUser);
+    } catch (error) {
+      console.error('Error fetching all users:', error);
+      return [];
+    }
+  }
+
 
   /**
    * Horários padrão de funcionamento

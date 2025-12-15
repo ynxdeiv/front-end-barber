@@ -34,20 +34,24 @@ export class SignupPageComponent {
     this.showPassword = !this.showPassword;
   }
 
-  onSignupSubmit(data: { id: number; name: string; email: string; phone: string; password: string  }) {
-    // Registrar como cliente (scheduler)
-    const result = this.authService.registerScheduler({
-      name: data.name,
-      email: data.email,
-      phone: data.phone,
-      password: data.password
-    });
+  async onSignupSubmit(data: { id: number; name: string; email: string; phone: string; password: string  }) {
+    try {
+      // Registrar como cliente (scheduler)
+      const result = await this.authService.registerScheduler({
+        name: data.name,
+        email: data.email,
+        phone: data.phone,
+        password: data.password
+      });
 
-    if (result.success && result.user) {
-      // Redirecionar automaticamente para a tela de agendamento
-      this.router.navigate(['/appointment']);
-    } else {
-      alert(result.message);
+      if (result.success && result.user) {
+        // Redirecionar automaticamente para a tela de agendamento
+        this.router.navigate(['/appointment']);
+      } else {
+        alert(result.message);
+      }
+    } catch (error) {
+      alert('Erro ao criar conta. Tente novamente.');
     }
   }
 }
