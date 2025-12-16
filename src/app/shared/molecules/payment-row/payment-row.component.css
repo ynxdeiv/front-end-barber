@@ -1,0 +1,10 @@
+.app-payment-row {
+  @apply flex items-center gap-4 p-4 rounded-lg border border-border-light dark:border-border-dark bg-input-bg-light dark:bg-input-bg-dark transition-colors hover:border-primary/30 dark:hover:border-primary/30;
+}
+
+@media (max-width: 768px) {
+  .app-payment-row {
+    @apply flex-col items-stretch;
+  }
+}
+

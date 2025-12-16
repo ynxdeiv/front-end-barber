@@ -1,0 +1,34 @@
+<app-card padding="md" class="h-full">
+  <div class="flex flex-col gap-4">
+    <div class="flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <div [class]="'flex items-center justify-center rounded-lg size-12 ' + colorClasses">
+          <app-icon [name]="icon" size="md"></app-icon>
+        </div>
+        <div>
+          <h3 class="text-sm font-medium text-text-muted-dark dark:text-text-muted-light">
+            {{ title }}
+          </h3>
+          <p class="text-2xl font-bold text-text-dark dark:text-text-light mt-1">
+            {{ formatValue() }}
+          </p>
+        </div>
+      </div>
+    </div>
+
+    @if (trend && trendValue) {
+      <div class="flex items-center gap-2 pt-2 border-t border-border-light dark:border-border-dark">
+        <app-icon [name]="trendIcon" size="sm" [class]="trendColor"></app-icon>
+        <span [class]="'text-xs font-medium ' + trendColor">
+          {{ trendValue }}
+        </span>
+        @if (trendLabel) {
+          <span class="text-xs text-text-muted-dark dark:text-text-muted-light">
+            {{ trendLabel }}
+          </span>
+        }
+      </div>
+    }
+  </div>
+</app-card>
+

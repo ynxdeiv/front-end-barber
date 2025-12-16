@@ -1,0 +1,139 @@
+@if (isOpen) {
+  <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm" (click)="onClose()">
+    <div class="relative w-full max-w-2xl bg-background-light dark:bg-background-dark rounded-lg shadow-xl max-h-[90vh] overflow-y-auto" (click)="$event.stopPropagation()">
+      <div class="p-6">
+        <!-- Header -->
+        <div class="flex items-center justify-between mb-6">
+          <h2 class="text-2xl font-bold text-text-dark dark:text-text-light">
+            Finalizar Pagamento
+          </h2>
+          <button
+            (click)="onClose()"
+            class="flex items-center justify-center size-8 rounded-lg hover:bg-input-bg-light dark:hover:bg-input-bg-dark transition-colors">
+            <app-icon name="close" size="md" class="text-text-muted-dark dark:text-text-muted-light"></app-icon>
+          </button>
+        </div>
+
+        <!-- Resumo do Agendamento (sempre visível) -->
+        <app-card padding="md" class="mb-6">
+          <div class="flex flex-col gap-3">
+            <div class="flex items-center justify-between">
+              <span class="text-sm text-text-muted-dark dark:text-text-muted-light">Serviço:</span>
+              <span class="text-base font-semibold text-text-dark dark:text-text-light">
+                {{ service?.name || appointment.serviceName }}
+              </span>
+            </div>
+            <div class="flex items-center justify-between">
+              <span class="text-sm text-text-muted-dark dark:text-text-muted-light">Data:</span>
+              <span class="text-base font-medium text-text-dark dark:text-text-light">
+                {{ formatDate(appointment.date) }}
+              </span>
+            </div>
+            <div class="flex items-center justify-between">
+              <span class="text-sm text-text-muted-dark dark:text-text-muted-light">Horário:</span>
+              <span class="text-base font-medium text-text-dark dark:text-text-light">
+                {{ appointment.time }}
+              </span>
+            </div>
+            <div class="pt-3 border-t border-border-light dark:border-border-dark">
+              <div class="flex items-center justify-between">
+                <span class="text-lg font-semibold text-text-dark dark:text-text-light">Total:</span>
+                <app-price-tag [price]="totalPrice" size="lg"></app-price-tag>
+              </div>
+            </div>
+          </div>
+        </app-card>
+
+        <!-- Step 1: Seleção de Método -->
+        @if (currentStep() === 'method_selection') {
+          <div class="mb-6">
+            <h3 class="text-lg font-semibold text-text-dark dark:text-text-light mb-4">
+              Selecione a forma de pagamento:
+            </h3>
+            <div class="grid grid-cols-2 gap-3">
+              @for (method of paymentMethods; track method.value) {
+                <button
+                  (click)="selectPaymentMethod(method.value)"
+                  [class.ring-2]="selectedPaymentMethod() === method.value"
+                  [class.ring-primary]="selectedPaymentMethod() === method.value"
+                  class="flex flex-col items-center gap-2 p-4 rounded-lg border border-border-light dark:border-border-dark hover:bg-input-bg-light dark:hover:bg-input-bg-dark transition-all text-left">
+                  <app-icon [name]="method.icon" size="lg" class="text-text-muted-dark dark:text-text-muted-light"></app-icon>
+                  <div class="flex flex-col items-center">
+                    <span class="text-sm font-medium text-text-dark dark:text-text-light text-center">
+                      {{ method.label }}
+                    </span>
+                    <span class="text-xs text-text-muted-dark dark:text-text-muted-light text-center">
+                      {{ method.description }}
+                    </span>
+                  </div>
+                </button>
+              }
+            </div>
+          </div>
+        }
+
+        <!-- Step 2: Formulário de Pagamento -->
+        @if (currentStep() === 'payment_form') {
+          <div class="mb-6">
+            <div class="flex items-center justify-between mb-4">
+              <h3 class="text-lg font-semibold text-text-dark dark:text-text-light">
+                {{ selectedPaymentMethod() === 'pix' ? 'Pagamento via PIX' : 'Dados do Cartão' }}
+              </h3>
+              <app-button
+                type="button"
+                variant="outline"
+                size="sm"
+                (click)="goBack()">
+                <app-icon name="arrow_back" size="sm"></app-icon>
+                Voltar
+              </app-button>
+            </div>
+
+            @if (selectedPaymentMethod() === 'pix') {
+              <app-pix-payment-flow
+                [amount]="totalPrice"
+                [description]="service?.name || appointment.serviceName || 'Agendamento'"
+                (paymentConfirmed)="onPixPaymentConfirmed($event)"
+                (cancel)="goBack()">
+              </app-pix-payment-flow>
+            } @else if (selectedPaymentMethod() === 'credit_card' || selectedPaymentMethod() === 'debit_card') {
+              <app-credit-card-form
+                [amount]="totalPrice"
+                (submit)="onCreditCardSubmit($event)"
+                (cancel)="goBack()">
+              </app-credit-card-form>
+            }
+          </div>
+        }
+
+        <!-- Step 3: Processando -->
+        @if (currentStep() === 'processing') {
+          <div class="flex flex-col items-center justify-center py-12">
+            <app-icon name="hourglass_empty" size="xl" class="animate-spin text-primary dark:text-primary-accent mb-4"></app-icon>
+            <p class="text-lg font-medium text-text-dark dark:text-text-light mb-2">
+              Processando pagamento...
+            </p>
+            <p class="text-sm text-text-muted-dark dark:text-text-muted-light">
+              Por favor, aguarde
+            </p>
+          </div>
+        }
+
+        <!-- Step 4: Sucesso -->
+        @if (currentStep() === 'success' && paymentResult()) {
+          <div class="flex flex-col items-center justify-center py-12">
+            <div class="rounded-full bg-green-100 dark:bg-green-900/30 size-20 flex items-center justify-center mb-4">
+              <app-icon name="check_circle" size="xl" class="text-green-600 dark:text-green-400"></app-icon>
+            </div>
+            <p class="text-lg font-semibold text-text-dark dark:text-text-light mb-2">
+              Pagamento Confirmado!
+            </p>
+            <p class="text-sm text-text-muted-dark dark:text-text-muted-light text-center">
+              {{ paymentResult()?.message }}
+            </p>
+          </div>
+        }
+      </div>
+    </div>
+  </div>
+}

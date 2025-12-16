@@ -1,0 +1,90 @@
+<app-card padding="lg">
+  <form (ngSubmit)="onSubmit()" class="flex flex-col gap-4">
+    <div>
+      <h3 class="text-lg font-semibold text-text-dark dark:text-text-light mb-4">
+        Novo Pagamento
+      </h3>
+    </div>
+
+    <div>
+      <app-label for="barbeiro">Barbeiro *</app-label>
+      <select
+        id="barbeiro"
+        [(ngModel)]="formData.barbeiroId"
+        name="barbeiroId"
+        required
+        class="w-full px-4 py-2 rounded-lg border border-border-light dark:border-border-dark bg-input-bg-light dark:bg-input-bg-dark text-text-dark dark:text-text-light focus:outline-none focus:ring-2 focus:ring-primary/50">
+        <option [value]="0">Selecione um barbeiro</option>
+        @for (barbeiro of barbeiros; track barbeiro.id) {
+          <option [value]="barbeiro.id">{{ barbeiro.name }} ({{ barbeiro.commissionPercentage }}%)</option>
+        }
+      </select>
+    </div>
+
+    <div>
+      <app-label for="amount">Valor do Serviço (R$) *</app-label>
+      <app-input
+        id="amount"
+        type="number"
+        name="amount"
+        [(ngModel)]="formData.amount"
+        placeholder="0.00"
+        step="0.01"
+        min="0"
+        required>
+      </app-input>
+    </div>
+
+    <div>
+      <app-label for="serviceDescription">Descrição do Serviço *</app-label>
+      <app-input
+        id="serviceDescription"
+        type="text"
+        name="serviceDescription"
+        [(ngModel)]="formData.serviceDescription"
+        placeholder="Ex: Corte + Barba"
+        required>
+      </app-input>
+    </div>
+
+    <div>
+      <app-label for="notes">Observações</app-label>
+      <textarea
+        id="notes"
+        name="notes"
+        [(ngModel)]="formData.notes"
+        rows="3"
+        class="w-full px-4 py-2 rounded-lg border border-border-light dark:border-border-dark bg-input-bg-light dark:bg-input-bg-dark text-text-dark dark:text-text-light focus:outline-none focus:ring-2 focus:ring-primary/50 resize-none"
+        placeholder="Observações adicionais (opcional)"></textarea>
+    </div>
+
+    @if (selectedBarbeiro && formData.amount) {
+      <div class="p-4 rounded-lg bg-primary/10 dark:bg-primary/20 border border-primary/20">
+        <div class="flex items-center justify-between mb-2">
+          <span class="text-sm text-text-muted-dark dark:text-text-muted-light">Comissão ({{ selectedBarbeiro.commissionPercentage }}%):</span>
+          <span class="text-lg font-semibold text-text-dark dark:text-text-light">
+            {{ formatCurrency(calculatedCommission) }}
+          </span>
+        </div>
+      </div>
+    }
+
+    <div class="flex gap-3 pt-2">
+      <app-button
+        type="button"
+        variant="outline"
+        [fullWidth]="true"
+        (click)="onCancel()">
+        Cancelar
+      </app-button>
+      <app-button
+        type="submit"
+        variant="secondary"
+        [fullWidth]="true"
+        [disabled]="!formData.barbeiroId || !formData.amount || !formData.serviceDescription">
+        Criar Pagamento
+      </app-button>
+    </div>
+  </form>
+</app-card>
+

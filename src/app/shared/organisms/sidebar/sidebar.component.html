@@ -17,10 +17,44 @@
       </button>
     </div>
     <nav class="flex flex-col gap-2 mt-4">
-      <a class="flex items-center gap-3 px-3 py-2 rounded-lg bg-primary/20 text-text-dark dark:bg-primary/20 dark:text-text-light transition-colors" routerLink="/appointment">
-        <app-icon name="calendar_month" size="md" [filled]="true"></app-icon>
-        <p class="text-sm font-medium leading-normal sidebar-text">Agendamentos</p>
+      <a 
+        routerLink="/"
+        routerLinkActive="bg-primary/20 text-text-dark dark:bg-primary/20 dark:text-text-light"
+        class="flex items-center gap-3 px-3 py-2 rounded-lg text-text-muted-dark dark:text-text-light hover:bg-input-bg-light dark:hover:bg-input-bg-dark transition-colors">
+        <app-icon name="home" size="md"></app-icon>
+        <p class="text-sm font-medium leading-normal sidebar-text">Início</p>
       </a>
+      @if (authService.isAdmin()) {
+        <a 
+          routerLink="/admin"
+          routerLinkActive="bg-primary/20 text-text-dark dark:bg-primary/20 dark:text-text-light"
+          class="flex items-center gap-3 px-3 py-2 rounded-lg text-text-muted-dark dark:text-text-light hover:bg-input-bg-light dark:hover:bg-input-bg-dark transition-colors">
+          <app-icon name="dashboard" size="md"></app-icon>
+          <p class="text-sm font-medium leading-normal sidebar-text">Dashboard</p>
+        </a>
+        <a 
+          routerLink="/payments"
+          routerLinkActive="bg-primary/20 text-text-dark dark:bg-primary/20 dark:text-text-light"
+          class="flex items-center gap-3 px-3 py-2 rounded-lg text-text-muted-dark dark:text-text-light hover:bg-input-bg-light dark:hover:bg-input-bg-dark transition-colors">
+          <app-icon name="payments" size="md"></app-icon>
+          <p class="text-sm font-medium leading-normal sidebar-text">Pagamentos</p>
+        </a>
+      } @else {
+        <a 
+          routerLink="/appointment"
+          routerLinkActive="bg-primary/20 text-text-dark dark:bg-primary/20 dark:text-text-light"
+          class="flex items-center gap-3 px-3 py-2 rounded-lg text-text-muted-dark dark:text-text-light hover:bg-input-bg-light dark:hover:bg-input-bg-dark transition-colors">
+          <app-icon name="calendar_month" size="md" [filled]="true"></app-icon>
+          <p class="text-sm font-medium leading-normal sidebar-text">Novo Agendamento</p>
+        </a>
+        <a 
+          routerLink="/my-appointments"
+          routerLinkActive="bg-primary/20 text-text-dark dark:bg-primary/20 dark:text-text-light"
+          class="flex items-center gap-3 px-3 py-2 rounded-lg text-text-muted-dark dark:text-text-light hover:bg-input-bg-light dark:hover:bg-input-bg-dark transition-colors">
+          <app-icon name="event_note" size="md"></app-icon>
+          <p class="text-sm font-medium leading-normal sidebar-text">Meus Agendamentos</p>
+        </a>
+      }
       <a class="flex items-center gap-3 px-3 py-2 rounded-lg text-text-muted-dark dark:text-text-light hover:bg-input-bg-light dark:hover:bg-input-bg-dark transition-colors" href="#">
         <app-icon name="content_cut" size="md"></app-icon>
         <p class="text-sm font-medium leading-normal sidebar-text">Serviços</p>
@@ -32,7 +66,7 @@
         <app-icon name="settings" size="md"></app-icon>
         <p class="text-sm font-medium leading-normal sidebar-text">Configurações</p>
       </a>
-      <a class="flex items-center gap-3 px-3 py-2 rounded-lg text-text-muted-dark dark:text-text-light hover:bg-input-bg-light dark:hover:bg-input-bg-dark transition-colors" routerLink="/login">
+      <a class="flex items-center gap-3 px-3 py-2 rounded-lg text-text-muted-dark dark:text-text-light hover:bg-input-bg-light dark:hover:bg-input-bg-dark transition-colors cursor-pointer" (click)="onLogout()">
         <app-icon name="logout" size="md"></app-icon>
         <p class="text-sm font-medium leading-normal sidebar-text">Sair</p>
       </a>

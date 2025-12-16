@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter, OnInit, OnChanges, SimpleChanges } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnInit, OnChanges, SimpleChanges, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { IconComponent } from '../../atoms/icon/icon.component';
 import { AppointmentService } from '../../../services/appointment.service';
@@ -17,6 +17,7 @@ export class CalendarComponent implements OnInit, OnChanges {
 
   currentDate = new Date();
   selectedDay = 0;
+  daysWithAppointments = signal<Set<number>>(new Set());
 
   constructor(private appointmentService: AppointmentService) {
     // Inicializar com a data atual
@@ -27,21 +28,44 @@ export class CalendarComponent implements OnInit, OnChanges {
 
   ngOnInit(): void {
     this.updateSelectedDay();
+    this.loadMonthAppointments();
   }
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['selectedDate'] && changes['selectedDate'].currentValue) {
       const newDate = changes['selectedDate'].currentValue as Date;
       // Atualizar o mês atual se necessário
-      if (newDate.getMonth() !== this.currentDate.getMonth() || 
+      if (newDate.getMonth() !== this.currentDate.getMonth() ||
           newDate.getFullYear() !== this.currentDate.getFullYear()) {
         this.currentDate = new Date(newDate.getFullYear(), newDate.getMonth(), 1);
+        this.loadMonthAppointments();
       }
       this.updateSelectedDay();
     }
     // Forçar detecção de mudanças quando refreshTrigger mudar
     if (changes['refreshTrigger']) {
-      // O Angular detectará automaticamente as mudanças através do método hasAppointments
+      this.loadMonthAppointments();
+    }
+  }
+
+  async loadMonthAppointments(): Promise<void> {
+    try {
+      const startDate = new Date(this.currentDate.getFullYear(), this.currentDate.getMonth(), 1);
+      const endDate = new Date(this.currentDate.getFullYear(), this.currentDate.getMonth() + 1, 0);
+
+      const appointments = await this.appointmentService.getAllAppointments();
+      const daysSet = new Set<number>();
+
+      appointments.forEach(apt => {
+        const aptDate = new Date(apt.date);
+        if (aptDate >= startDate && aptDate <= endDate) {
+          daysSet.add(aptDate.getDate());
+        }
+      });
+
+      this.daysWithAppointments.set(daysSet);
+    } catch (error) {
+      console.error('Error loading month appointments:', error);
     }
   }
 
@@ -103,11 +127,13 @@ export class CalendarComponent implements OnInit, OnChanges {
   previousMonth() {
     this.currentDate = new Date(this.currentDate.getFullYear(), this.currentDate.getMonth() - 1, 1);
     this.selectedDay = 0;
+    this.loadMonthAppointments();
   }
 
   nextMonth() {
     this.currentDate = new Date(this.currentDate.getFullYear(), this.currentDate.getMonth() + 1, 1);
     this.selectedDay = 0;
+    this.loadMonthAppointments();
   }
 
   selectDay(day: number) {
@@ -129,15 +155,15 @@ export class CalendarComponent implements OnInit, OnChanges {
       this.currentDate.getMonth(),
       day
     );
-    
+
     // Verificar se é a data selecionada
-    if (this.selectedDate && 
+    if (this.selectedDate &&
         date.getDate() === this.selectedDate.getDate() &&
         date.getMonth() === this.selectedDate.getMonth() &&
         date.getFullYear() === this.selectedDate.getFullYear()) {
       return true;
     }
-    
+
     return day === this.selectedDay && day > 0;
   }
 
@@ -153,12 +179,7 @@ export class CalendarComponent implements OnInit, OnChanges {
 
   hasAppointments(day: number): boolean {
     if (day === 0) return false;
-    const date = new Date(
-      this.currentDate.getFullYear(),
-      this.currentDate.getMonth(),
-      day
-    );
-    return this.appointmentService.hasAppointments(date);
+    return this.daysWithAppointments().has(day);
   }
 }
 

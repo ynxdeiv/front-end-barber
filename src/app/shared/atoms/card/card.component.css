@@ -1,0 +1,24 @@
+.app-card {
+  @apply rounded-lg border border-border-light dark:border-border-dark bg-input-bg-light dark:bg-input-bg-dark;
+}
+
+.app-card--padding-none {
+  @apply p-0;
+}
+
+.app-card--padding-sm {
+  @apply p-3;
+}
+
+.app-card--padding-md {
+  @apply p-4;
+}
+
+.app-card--padding-lg {
+  @apply p-6;
+}
+
+.app-card--hover {
+  @apply transition-all duration-200 hover:shadow-lg hover:border-primary/20;
+}
+

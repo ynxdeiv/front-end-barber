@@ -4,7 +4,6 @@ import { Validators, FormControl, FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { FormFieldComponent } from '../../molecules/form-field/form-field.component';
 import { PasswordFieldComponent } from '../../molecules/password-field/password-field.component';
-import { LinkComponent } from '../../atoms/link/link.component';
 
 @Component({
   selector: 'app-signup-form',
@@ -13,8 +12,7 @@ import { LinkComponent } from '../../atoms/link/link.component';
     CommonModule,
     FormsModule,
     FormFieldComponent,
-    PasswordFieldComponent,
-    LinkComponent
+    PasswordFieldComponent
   ],
   templateUrl: './signup-form.component.html',
   styleUrl: './signup-form.component.css'
@@ -42,7 +40,7 @@ export class SignupFormComponent {
     const value = (email || '').trim();
     if (!value) return false;
     const control = new FormControl(value);
-    const validationResult = Validators.email(control); 
+    const validationResult = Validators.email(control);
     return validationResult === null;
   }
 
@@ -77,7 +75,7 @@ export class SignupFormComponent {
       alert('Telefone inválido! Use o formato (XX)XXXXX-XXXX');
       return;
     }
-    
+
     if (!this.validatePassword(this.password)) {
       alert('Senha inválida! Deve conter ao menos 6 caracteres.')
       return;

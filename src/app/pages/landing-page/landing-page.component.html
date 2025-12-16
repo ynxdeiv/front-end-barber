@@ -1,0 +1,45 @@
+<app-landing-template>
+  <app-hero-section
+    title="Sua Barbearia de Confiança"
+    subtitle="Estilo e Qualidade"
+    description="Transforme seu visual com nossos profissionais experientes. Agende seu horário agora!"
+    ctaText="Agendar Agora"
+    backgroundImage="https://images.unsplash.com/photo-1585747860715-2ba37e788b70?w=1920&auto=format&fit=crop&q=80"
+    heroImage="https://images.unsplash.com/photo-1621605815971-fbc98d665033?w=800&auto=format&fit=crop&q=80"
+    heroImageAlt="Barbeiro profissional realizando corte moderno">
+  </app-hero-section>
+
+  <!-- Features Section -->
+  <section class="py-16 bg-background-light dark:bg-background-dark">
+    <div class="container mx-auto px-4">
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        @for (feature of features; track feature.icon) {
+          <app-feature-highlight
+            [icon]="feature.icon"
+            [title]="feature.title"
+            [description]="feature.description">
+          </app-feature-highlight>
+        }
+      </div>
+    </div>
+  </section>
+
+  <app-services-showcase
+    [services]="services"
+    (bookService)="onBookService($event)">
+  </app-services-showcase>
+
+  <app-gallery-preview
+    [items]="galleryItems"
+    [maxItems]="6">
+  </app-gallery-preview>
+
+  <app-business-hours
+    [businessHours]="businessHours">
+  </app-business-hours>
+
+  <app-contact-section
+    [contactInfo]="contactInfo">
+  </app-contact-section>
+</app-landing-template>
+

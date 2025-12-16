@@ -1,0 +1,77 @@
+<div class="min-h-screen bg-background-light dark:bg-background-dark">
+  <!-- Header/Navbar -->
+  <header class="sticky top-0 z-50 bg-background-light/95 dark:bg-background-dark/95 backdrop-blur-sm border-b border-border-light dark:border-border-dark">
+    <nav class="container mx-auto px-4 py-4">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <div class="flex items-center justify-center rounded-full size-10 bg-primary dark:bg-primary">
+            <app-icon name="content_cut" size="md" class="text-pearl-white"></app-icon>
+          </div>
+          <span class="text-xl font-bold text-text-dark dark:text-text-light">Barber Agenda</span>
+        </div>
+
+        <div class="flex items-center gap-4">
+          @if (authService.checkAuth()) {
+            <span class="text-sm text-text-muted-dark dark:text-text-muted-light">
+              Olá, {{ authService.getCurrentUser()?.name }}
+            </span>
+            @if (authService.isAdmin()) {
+              <app-button
+                type="button"
+                variant="outline"
+                size="sm"
+                routerLink="/admin">
+                Dashboard
+              </app-button>
+            } @else {
+              <app-button
+                type="button"
+                variant="outline"
+                size="sm"
+                routerLink="/appointment">
+                Agendar
+              </app-button>
+            }
+            <app-button
+              type="button"
+              variant="secondary"
+              size="sm"
+              (click)="logout()">
+              Sair
+            </app-button>
+          } @else {
+            <app-button
+              type="button"
+              variant="outline"
+              size="sm"
+              routerLink="/login">
+              Entrar
+            </app-button>
+            <app-button
+              type="button"
+              variant="secondary"
+              size="sm"
+              routerLink="/signup">
+              Cadastrar
+            </app-button>
+          }
+        </div>
+      </div>
+    </nav>
+  </header>
+
+  <!-- Main Content -->
+  <main>
+    <ng-content></ng-content>
+  </main>
+
+  <!-- Footer -->
+  <footer class="bg-primary text-pearl-white py-8 mt-16">
+    <div class="container mx-auto px-4 text-center">
+      <p class="text-sm opacity-90">
+        © {{ currentYear }} Barber Agenda. Todos os direitos reservados.
+      </p>
+    </div>
+  </footer>
+</div>
+

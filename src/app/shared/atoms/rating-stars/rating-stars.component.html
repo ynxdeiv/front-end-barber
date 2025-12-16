@@ -1,0 +1,16 @@
+<div class="flex items-center gap-1">
+  @for (star of stars; track star) {
+    <app-icon
+      [name]="isFilled(star) ? 'star' : 'star_border'"
+      [size]="size"
+      [filled]="isFilled(star)"
+      class="text-yellow-400 dark:text-yellow-500">
+    </app-icon>
+  }
+  @if (showNumber) {
+    <span class="text-sm text-text-muted-dark dark:text-text-muted-light ml-1">
+      ({{ rating.toFixed(1) }})
+    </span>
+  }
+</div>
+

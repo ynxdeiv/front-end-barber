@@ -46,7 +46,7 @@ export class TimeSlotListComponent implements OnInit, OnChanges {
    * Gera os horários disponíveis para o dia selecionado
    * Horário de funcionamento: 09:00 às 18:00, com intervalos de 30 minutos
    */
-  generateTimeSlots(): void {
+  async generateTimeSlots(): Promise<void> {
     const slots: TimeSlot[] = [];
     const startHour = 9;
     const endHour = 18;
@@ -55,24 +55,24 @@ export class TimeSlotListComponent implements OnInit, OnChanges {
     for (let hour = startHour; hour < endHour; hour++) {
       for (let minute = 0; minute < 60; minute += intervalMinutes) {
         const startTime = `${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')}`;
-        
+
         let endHourCalc = hour;
         let endMinuteCalc = minute + intervalMinutes;
-        
+
         if (endMinuteCalc >= 60) {
           endHourCalc++;
           endMinuteCalc = 0;
         }
-        
+
         // Não criar slot se ultrapassar o horário de fechamento
         if (endHourCalc >= endHour && endMinuteCalc > 0) {
           break;
         }
-        
+
         const endTime = `${String(endHourCalc).padStart(2, '0')}:${String(endMinuteCalc).padStart(2, '0')}`;
-        
+
         // Verificar se o horário está disponível
-        const available = this.appointmentService.isTimeSlotAvailable(
+        const available = await this.appointmentService.isTimeSlotAvailable(
           this.selectedDate,
           startTime,
           endTime
@@ -95,11 +95,11 @@ export class TimeSlotListComponent implements OnInit, OnChanges {
       'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
       'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'
     ];
-    
+
     const dayName = days[this.selectedDate.getDay()];
     const day = this.selectedDate.getDate();
     const month = months[this.selectedDate.getMonth()];
-    
+
     return `${dayName}, ${day} de ${month}`;
   }
 

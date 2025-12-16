@@ -1,0 +1,60 @@
+<div class="app-payment-row">
+  <div class="flex items-center gap-4 flex-1 min-w-0">
+    <div class="flex items-center justify-center rounded-lg bg-primary/10 dark:bg-primary/20 shrink-0 size-12">
+      <app-icon name="account_circle" size="md" class="text-primary dark:text-primary-accent"></app-icon>
+    </div>
+    <div class="flex-1 min-w-0">
+      <p class="text-base font-medium text-text-dark dark:text-text-light truncate">
+        {{ payment.barbeiroName }}
+      </p>
+      <p class="text-sm text-text-muted-dark dark:text-text-muted-light truncate">
+        {{ payment.serviceDescription }}
+      </p>
+    </div>
+  </div>
+
+  <div class="flex items-center gap-6">
+    <div class="text-right">
+      <p class="text-base font-semibold text-text-dark dark:text-text-light">
+        {{ formatCurrency(payment.commission) }}
+      </p>
+      <p class="text-xs text-text-muted-dark dark:text-text-muted-light">
+        Total: {{ formatCurrency(payment.amount) }}
+      </p>
+    </div>
+
+    <div class="flex flex-col items-end gap-2">
+      <app-badge [variant]="getStatusVariant(payment.status)" size="sm">
+        {{ getStatusLabel(payment.status) }}
+      </app-badge>
+      <p class="text-xs text-text-muted-dark dark:text-text-muted-light">
+        Venc: {{ formatDate(payment.dueDate) }}
+      </p>
+    </div>
+
+    <div class="flex items-center gap-2">
+      @if (payment.status === 'pending') {
+        <app-button
+          type="button"
+          variant="secondary"
+          size="sm"
+          (click)="onMarkAsPaid()">
+          Marcar como Pago
+        </app-button>
+        <button
+          (click)="onCancel()"
+          class="flex items-center justify-center size-8 rounded-md hover:bg-red-100 dark:hover:bg-red-900/30 transition-colors"
+          title="Cancelar pagamento">
+          <app-icon name="close" size="sm" class="text-red-600 dark:text-red-400"></app-icon>
+        </button>
+      }
+      <button
+        (click)="onViewDetails()"
+        class="flex items-center justify-center size-8 rounded-md hover:bg-input-bg-light dark:hover:bg-input-bg-dark transition-colors"
+        title="Ver detalhes">
+        <app-icon name="info" size="sm" class="text-text-muted-dark dark:text-text-muted-light"></app-icon>
+      </button>
+    </div>
+  </div>
+</div>
+

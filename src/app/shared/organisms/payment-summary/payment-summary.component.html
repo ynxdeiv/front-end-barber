@@ -1,0 +1,67 @@
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+  <app-card padding="md">
+    <div class="flex items-center justify-between">
+      <div>
+        <p class="text-sm text-text-muted-dark dark:text-text-muted-light mb-1">Total Geral</p>
+        <p class="text-2xl font-bold text-text-dark dark:text-text-light">
+          {{ formatCurrency(summary.total) }}
+        </p>
+      </div>
+      <div class="flex items-center justify-center rounded-full size-12 bg-primary/10 dark:bg-primary/20">
+        <app-icon name="payments" size="md" class="text-primary dark:text-primary-accent"></app-icon>
+      </div>
+    </div>
+  </app-card>
+
+  <app-card padding="md">
+    <div class="flex items-center justify-between">
+      <div>
+        <p class="text-sm text-text-muted-dark dark:text-text-muted-light mb-1">Pendentes</p>
+        <p class="text-2xl font-bold text-yellow-600 dark:text-yellow-400">
+          {{ formatCurrency(summary.pending) }}
+        </p>
+        <p class="text-xs text-text-muted-dark dark:text-text-muted-light mt-1">
+          {{ summary.pendingCount }} pagamento(s)
+        </p>
+      </div>
+      <div class="flex items-center justify-center rounded-full size-12 bg-yellow-100 dark:bg-yellow-900/30">
+        <app-icon name="schedule" size="md" class="text-yellow-600 dark:text-yellow-400"></app-icon>
+      </div>
+    </div>
+  </app-card>
+
+  <app-card padding="md">
+    <div class="flex items-center justify-between">
+      <div>
+        <p class="text-sm text-text-muted-dark dark:text-text-muted-light mb-1">Pagos</p>
+        <p class="text-2xl font-bold text-green-600 dark:text-green-400">
+          {{ formatCurrency(summary.paid) }}
+        </p>
+        <p class="text-xs text-text-muted-dark dark:text-text-muted-light mt-1">
+          {{ summary.paidCount }} pagamento(s)
+        </p>
+      </div>
+      <div class="flex items-center justify-center rounded-full size-12 bg-green-100 dark:bg-green-900/30">
+        <app-icon name="check_circle" size="md" class="text-green-600 dark:text-green-400"></app-icon>
+      </div>
+    </div>
+  </app-card>
+
+  <app-card padding="md">
+    <div class="flex items-center justify-between">
+      <div>
+        <p class="text-sm text-text-muted-dark dark:text-text-muted-light mb-1">Cancelados</p>
+        <p class="text-2xl font-bold text-red-600 dark:text-red-400">
+          {{ formatCurrency(summary.cancelled) }}
+        </p>
+        <p class="text-xs text-text-muted-dark dark:text-text-muted-light mt-1">
+          {{ summary.cancelledCount }} pagamento(s)
+        </p>
+      </div>
+      <div class="flex items-center justify-center rounded-full size-12 bg-red-100 dark:bg-red-900/30">
+        <app-icon name="cancel" size="md" class="text-red-600 dark:text-red-400"></app-icon>
+      </div>
+    </div>
+  </app-card>
+</div>
+

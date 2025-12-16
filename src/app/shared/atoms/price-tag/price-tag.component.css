@@ -1,0 +1,16 @@
+.app-price-tag {
+  @apply font-semibold text-primary dark:text-primary-accent;
+}
+
+.app-price-tag--sm {
+  @apply text-sm;
+}
+
+.app-price-tag--md {
+  @apply text-base;
+}
+
+.app-price-tag--lg {
+  @apply text-xl;
+}
+

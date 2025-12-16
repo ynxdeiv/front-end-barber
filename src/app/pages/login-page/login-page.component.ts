@@ -1,12 +1,12 @@
-import { Component } from '@angular/core';
+import { Component, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { EmailValidator, FormsModule } from '@angular/forms';
+import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthTemplateComponent } from '../../shared/templates/auth-template/auth-template.component';
 import { AuthImageComponent } from '../../shared/organisms/auth-image/auth-image.component';
 import { AuthHeaderComponent } from '../../shared/organisms/auth-header/auth-header.component';
 import { LoginFormComponent } from '../../shared/organisms/login-form/login-form.component';
-import { UsuarioRepository } from '../../repositories/UsuarioRepository';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-login-page',
@@ -27,25 +27,36 @@ export class LoginPageComponent {
   loginImageUrl = 'https://nucleocursos.com.br/blog/wp-content/uploads/2024/03/Curso-de-barbearia-profissional.jpg';
   loginImageAlt = 'Curso de barbearia profissional - ambiente de barbearia moderna e equipada.';
 
-  private usuarioRepo = new UsuarioRepository();
+  showErrorMessage = signal(false);
+  errorMessage = signal('');
 
-  constructor(private router: Router) {}
+  constructor(
+    private router: Router,
+    private authService: AuthService
+  ) {}
 
   togglePasswordVisibility() {
     this.showPassword = !this.showPassword;
   }
 
-  onLoginSubmit(data: { email: string; password: string }) {
-    const { email, password } = data;
-    const valido = this.usuarioRepo.validarLogin(email, password);
+  async onLoginSubmit(data: { email: string; password: string }) {
+    try {
+      const result = await this.authService.login(data.email, data.password);
 
-    if (valido) {
-      const usuario = this.usuarioRepo.buscarPorEmail(email);
-      alert(`Bem-vindo, ${usuario?.name}!`);
-      this.router.navigate(['/appointment']);
-    } 
-    else {
-      alert('E-mail ou senha incorretos.');
+      if (result.success && result.user) {
+        // Redirecionar baseado no tipo de usuário detectado automaticamente
+        if (result.user.type === 'admin') {
+          this.router.navigate(['/admin']);
+        } else {
+          this.router.navigate(['/appointment']);
+        }
+      } else {
+        this.showErrorMessage.set(true);
+        this.errorMessage.set(result.message);
+      }
+    } catch (error) {
+      this.showErrorMessage.set(true);
+      this.errorMessage.set('Erro ao fazer login. Tente novamente.');
     }
   }
 }

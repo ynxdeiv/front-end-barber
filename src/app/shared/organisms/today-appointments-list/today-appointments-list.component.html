@@ -1,0 +1,54 @@
+<app-card padding="md">
+  <div class="flex flex-col gap-4">
+    <div class="flex items-center justify-between">
+      <h3 class="text-lg font-semibold text-text-dark dark:text-text-light">
+        Agendamentos de Hoje
+      </h3>
+      <app-badge variant="info" size="sm">
+        {{ appointments.length }}
+      </app-badge>
+    </div>
+
+    @if (appointments.length > 0) {
+      <div class="space-y-3">
+        @for (appointment of appointments; track appointment.id) {
+          <div class="flex items-center justify-between p-3 rounded-lg border border-border-light dark:border-border-dark bg-input-bg-light dark:bg-input-bg-dark hover:bg-input-bg-light/50 dark:hover:bg-input-bg-dark/50 transition-colors">
+            <div class="flex items-center gap-3 flex-1">
+              <div class="flex items-center justify-center rounded-lg size-10 bg-primary/10 dark:bg-primary/20">
+                <app-icon name="schedule" size="sm" class="text-primary dark:text-primary-accent"></app-icon>
+              </div>
+              <div class="flex-1">
+                <div class="flex items-center gap-2 mb-1">
+                  <span class="text-sm font-semibold text-text-dark dark:text-text-light">
+                    {{ formatTime(appointment.time) }}
+                  </span>
+                  <app-badge
+                    [variant]="getStatusBadgeVariant(appointment.status)"
+                    size="sm">
+                    {{ getStatusLabel(appointment.status) }}
+                  </app-badge>
+                </div>
+                <p class="text-xs text-text-muted-dark dark:text-text-muted-light">
+                  {{ appointment.serviceName || 'Serviço não especificado' }}
+                </p>
+                @if (appointment.servicePrice) {
+                  <p class="text-xs font-medium text-text-dark dark:text-text-light mt-1">
+                    R$ {{ appointment.servicePrice.toFixed(2) }}
+                  </p>
+                }
+              </div>
+            </div>
+          </div>
+        }
+      </div>
+    } @else {
+      <div class="text-center py-8">
+        <app-icon name="event_busy" size="xl" class="text-text-muted-dark dark:text-text-muted-light mx-auto mb-2"></app-icon>
+        <p class="text-sm text-text-muted-dark dark:text-text-muted-light">
+          Nenhum agendamento para hoje
+        </p>
+      </div>
+    }
+  </div>
+</app-card>
+

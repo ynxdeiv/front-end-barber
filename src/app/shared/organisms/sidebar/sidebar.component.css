@@ -74,8 +74,7 @@ aside {
 }
 
 /* Forçar cores corretas no aside */
-aside.bg-white,
-aside.dark\:bg-\[#111813\] {
+aside.bg-white {
   background-color: var(--background-light) !important;
 }
 
