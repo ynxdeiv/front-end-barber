@@ -8,12 +8,14 @@ export interface Appointment {
   time: string; // Format: "HH:MM - HH:MM"
   startTime: string; // Format: "HH:MM"
   endTime: string; // Format: "HH:MM"
-  userId?: string; // ID do usuário que fez o agendamento (referência ao data/users.ts)
+  userId?: number; // ID do usuário que fez o agendamento
   userName?: string; // Nome do usuário (para exibição rápida)
   userEmail?: string; // Email do usuário (para referência)
   serviceId?: number; // ID do serviço selecionado
   serviceName?: string; // Nome do serviço (para exibição)
   servicePrice?: number; // Preço do serviço
+  barberId?: number; // ID do barbeiro
+  barberName?: string; // Nome do barbeiro
   status: AppointmentStatus; // Status do agendamento
   paymentId?: string; // ID do pagamento associado
   createdAt: string; // ISO date string

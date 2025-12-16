@@ -41,8 +41,8 @@ export class MetricsCalculationService {
   /**
    * Calcula todas as métricas do dashboard
    */
-  calculateMetrics(): DashboardMetrics {
-    const appointments = this.appointmentService.getAllAppointments();
+  async calculateMetrics(): Promise<DashboardMetrics> {
+    const appointments = await this.appointmentService.getAllAppointments();
     const payments = this.paymentService.getAllPayments();
     const today = new Date();
     const todayString = this.formatDate(today);
@@ -118,7 +118,7 @@ export class MetricsCalculationService {
     ).length;
 
     // Taxa de retenção (simplificada - clientes com mais de 1 agendamento)
-    const clientAppointmentCounts = new Map<string, number>();
+    const clientAppointmentCounts = new Map<number, number>();
     appointments.forEach(apt => {
       if (apt.userId) {
         clientAppointmentCounts.set(apt.userId, (clientAppointmentCounts.get(apt.userId) || 0) + 1);
@@ -176,10 +176,10 @@ export class MetricsCalculationService {
   /**
    * Obtém agendamentos de hoje
    */
-  getTodayAppointments(): Appointment[] {
+  async getTodayAppointments(): Promise<Appointment[]> {
     const today = new Date();
     const todayString = this.formatDate(today);
-    const allAppointments = this.appointmentService.getAllAppointments();
+    const allAppointments = await this.appointmentService.getAllAppointments();
     return allAppointments
       .filter(apt => apt.date === todayString)
       .sort((a, b) => {

@@ -70,10 +70,10 @@ export class MyAppointmentsPageComponent implements OnInit {
     this.loadAppointments();
   }
 
-  loadAppointments(): void {
+  async loadAppointments(): Promise<void> {
     const user = this.authService.getCurrentUser();
     if (user?.id) {
-      const userAppointments = this.appointmentService.getAppointmentsByUserId(user.id.toString());
+      const userAppointments = await this.appointmentService.getAppointmentsByUserId(user.id);
       this.appointments.set(userAppointments);
       this.applyFilters();
     }
@@ -164,13 +164,17 @@ export class MyAppointmentsPageComponent implements OnInit {
            (appointment.status === 'confirmed' || appointment.status === 'pending_payment');
   }
 
-  onCancel(appointment: Appointment): void {
+  async onCancel(appointment: Appointment): Promise<void> {
     if (confirm(`Tem certeza que deseja cancelar o agendamento de ${this.formatDate(appointment.date)} às ${appointment.time}?`)) {
-      const success = this.appointmentService.cancelAppointment(appointment.id);
-      if (success) {
-        this.loadAppointments();
-        alert('Agendamento cancelado com sucesso!');
-      } else {
+      try {
+        const result = await this.appointmentService.cancelAppointment(appointment.id);
+        if (result.success) {
+          await this.loadAppointments();
+          alert('Agendamento cancelado com sucesso!');
+        } else {
+          alert('Erro ao cancelar agendamento. Tente novamente.');
+        }
+      } catch (error) {
         alert('Erro ao cancelar agendamento. Tente novamente.');
       }
     }
@@ -196,9 +200,11 @@ export class MyAppointmentsPageComponent implements OnInit {
     this.rescheduleService.set(service);
   }
 
-  confirmReschedule(): void {
+  async confirmReschedule(): Promise<void> {
     const appointment = this.selectedAppointment();
-    if (!appointment || !this.rescheduleDate() || !this.rescheduleTime() || !this.rescheduleService()) {
+    const user = this.authService.getCurrentUser();
+
+    if (!appointment || !this.rescheduleDate() || !this.rescheduleTime() || !this.rescheduleService() || !user?.id) {
       alert('Por favor, complete todas as informações para remarcar.');
       return;
     }
@@ -207,21 +213,27 @@ export class MyAppointmentsPageComponent implements OnInit {
     const [startTime] = this.rescheduleTime()!.split(' - ');
     const endTime = this.rescheduleTime()!.split(' - ')[1] || this.calculateEndTime(startTime, this.rescheduleService()!.duration);
 
-    const success = this.appointmentService.rescheduleAppointment(
-      appointment.id,
-      this.rescheduleDate()!,
-      this.rescheduleTime()!,
-      startTime,
-      endTime
-    );
+    try {
+      const result = await this.appointmentService.rescheduleAppointment(
+        appointment.id,
+        this.rescheduleDate()!,
+        startTime,
+        endTime,
+        user.id,
+        this.rescheduleService()!.id,
+        appointment.barberId
+      );
 
-    if (success) {
-      this.showRescheduleModal.set(false);
-      this.loadAppointments();
-      this.refreshTrigger.update(v => v + 1);
-      alert('Agendamento remarcado com sucesso!');
-    } else {
-      alert('Este horário não está disponível. Por favor, escolha outro.');
+      if (result) {
+        this.showRescheduleModal.set(false);
+        await this.loadAppointments();
+        this.refreshTrigger.update(v => v + 1);
+        alert('Agendamento remarcado com sucesso!');
+      } else {
+        alert('Este horário não está disponível. Por favor, escolha outro.');
+      }
+    } catch (error) {
+      alert('Erro ao remarcar agendamento. Tente novamente.');
     }
   }
 

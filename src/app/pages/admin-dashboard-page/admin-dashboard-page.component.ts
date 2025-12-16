@@ -37,18 +37,23 @@ export class AdminDashboardPageComponent implements OnInit {
     this.loadDashboardData();
   }
 
-  loadDashboardData(): void {
+  async loadDashboardData(): Promise<void> {
     this.isLoading.set(true);
 
-    // Simular um pequeno delay para melhor UX
-    setTimeout(() => {
-      const metrics = this.metricsService.calculateMetrics();
-      const todayAppointments = this.metricsService.getTodayAppointments();
+    try {
+      // Simular um pequeno delay para melhor UX
+      await new Promise(resolve => setTimeout(resolve, 300));
+
+      const metrics = await this.metricsService.calculateMetrics();
+      const todayAppointments = await this.metricsService.getTodayAppointments();
 
       this.metrics.set(metrics);
       this.todayAppointments.set(todayAppointments);
+    } catch (error) {
+      console.error('Error loading dashboard data:', error);
+    } finally {
       this.isLoading.set(false);
-    }, 300);
+    }
   }
 
   get adminUser() {

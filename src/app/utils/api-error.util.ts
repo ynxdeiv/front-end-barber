@@ -108,9 +108,19 @@ export function logError(error: any, context?: string): void {
 }
 
 /**
- * Handles API errors and throws a structured error
+ * Handles API errors and returns a structured error
+ * Use this when you need to process the error before throwing
  */
-export function handleApiError(error: any): never {
+export function handleApiError(error: any): ApiError {
+  const apiError = createApiError(error);
+  logError(error);
+  return apiError;
+}
+
+/**
+ * Handles API errors and throws immediately
+ */
+export function throwApiError(error: any): never {
   const apiError = createApiError(error);
   logError(error);
   throw apiError;

@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Service, ServiceCategory } from '../models/service';
 import { apiClient } from '../config/api.config';
-import { handleApiError } from '../utils/api-error.util';
+import { throwApiError } from '../utils/api-error.util';
 
 export interface ServiceRequest {
   name: string;
@@ -39,7 +39,7 @@ export class ServiceService {
       const response = await apiClient.get<Service[]>(this.API_PATH, { params });
       return response.data;
     } catch (error) {
-      throw handleApiError(error);
+      throw throwApiError(error);
     }
   }
 
@@ -65,7 +65,7 @@ export class ServiceService {
       const response = await apiClient.get<Service>(`${this.API_PATH}/${id}`);
       return response.data;
     } catch (error) {
-      throw handleApiError(error);
+      throw throwApiError(error);
     }
   }
 
@@ -77,7 +77,7 @@ export class ServiceService {
       const response = await apiClient.post<Service>(this.API_PATH, serviceData);
       return response.data;
     } catch (error) {
-      throw handleApiError(error);
+      throw throwApiError(error);
     }
   }
 
@@ -89,7 +89,7 @@ export class ServiceService {
       const response = await apiClient.put<Service>(`${this.API_PATH}/${id}`, updates);
       return response.data;
     } catch (error) {
-      throw handleApiError(error);
+      throw throwApiError(error);
     }
   }
 
@@ -101,7 +101,7 @@ export class ServiceService {
       const response = await apiClient.delete<{ success: boolean; message: string }>(`${this.API_PATH}/${id}`);
       return response.data;
     } catch (error) {
-      throw handleApiError(error);
+      throw throwApiError(error);
     }
   }
 }

@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Barbeiro } from '../models/barbeiro';
 import { apiClient } from '../config/api.config';
-import { handleApiError } from '../utils/api-error.util';
+import { throwApiError } from '../utils/api-error.util';
 
 export interface BarberRequest {
   name: string;
@@ -30,7 +30,7 @@ export class BarberService {
       const response = await apiClient.get<Barbeiro[]>(this.API_PATH, { params });
       return response.data;
     } catch (error) {
-      throw handleApiError(error);
+      throw throwApiError(error);
     }
   }
 
@@ -49,7 +49,7 @@ export class BarberService {
       const response = await apiClient.get<Barbeiro>(`${this.API_PATH}/${id}`);
       return response.data;
     } catch (error) {
-      throw handleApiError(error);
+      throw throwApiError(error);
     }
   }
 
@@ -61,7 +61,7 @@ export class BarberService {
       const response = await apiClient.post<Barbeiro>(this.API_PATH, barberData);
       return response.data;
     } catch (error) {
-      throw handleApiError(error);
+      throw throwApiError(error);
     }
   }
 
@@ -73,7 +73,7 @@ export class BarberService {
       const response = await apiClient.put<Barbeiro>(`${this.API_PATH}/${id}`, updates);
       return response.data;
     } catch (error) {
-      throw handleApiError(error);
+      throw throwApiError(error);
     }
   }
 
@@ -85,7 +85,7 @@ export class BarberService {
       const response = await apiClient.delete<{ success: boolean; message: string }>(`${this.API_PATH}/${id}`);
       return response.data;
     } catch (error) {
-      throw handleApiError(error);
+      throw throwApiError(error);
     }
   }
 }

@@ -79,10 +79,6 @@ export class PaymentService {
   ): Promise<Pagamento | null> {
     try {
       const barbeiro = await this.barberService.getBarbeiroById(barbeiroId);
-      if (!barbeiro) {
-        console.error('Barbeiro não encontrado:', barbeiroId);
-        return null;
-      }
 
       const commission = (amount * barbeiro.commissionPercentage) / 100;
       const dueDate = new Date();
@@ -235,11 +231,12 @@ export class PaymentService {
     }
 
     // Marcar como pago imediatamente (simulação)
-    this.markAsPaid(payment.id);
+    const paymentId = payment.id;
+    this.markAsPaid(paymentId);
 
     return {
       success: true,
-      paymentId: payment.id,
+      paymentId: paymentId,
       message: 'Pagamento processado com sucesso!'
     };
   }

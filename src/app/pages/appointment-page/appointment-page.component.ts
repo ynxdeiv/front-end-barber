@@ -106,7 +106,7 @@ export class AppointmentPageComponent {
       this.selectedDate()!,
       this.selectedTime()!,
       this.selectedService()!,
-      user?.id ? user.id.toString() : undefined
+      user?.id
     );
 
     if (appointment) {

@@ -60,8 +60,7 @@ export class PaymentsPageComponent implements OnInit {
   async loadData(): Promise<void> {
     this.payments.set(this.paymentService.getAllPayments());
     try {
-      const barbers = await this.barberService.getActiveBarbeiros();
-      this.barbeiros.set(barbers);
+      this.barbeiros.set(await this.barberService.getActiveBarbeiros());
     } catch (error) {
       console.error('Error loading barbers:', error);
       this.barbeiros.set([]);
